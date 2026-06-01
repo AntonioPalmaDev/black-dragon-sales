@@ -48,7 +48,7 @@ export function SaleModal({ isOpen, onClose, editingSale }: SaleModalProps) {
   const { data: products } = useQuery({
     queryKey: ["products-active"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("products").select("id, name, sale_price, stock_current").eq("is_active", true).order("name");
+      const { data, error } = await supabase.from("products").select("id, name, sale_price, cost_price, stock_current").eq("is_active", true).order("name");
       if (error) throw error;
       return data;
     },
