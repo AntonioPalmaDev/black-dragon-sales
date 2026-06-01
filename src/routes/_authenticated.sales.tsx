@@ -67,8 +67,8 @@ function SalesPage() {
       if (error) throw error;
       toast.success("Venda cancelada com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["sales"] });
-    } catch (error) {
-      toast.error("Erro ao cancelar venda.");
+    } catch (error: any) {
+      toast.error(`Erro ao cancelar venda: ${error.message || "Erro desconhecido"}`);
       console.error(error);
     }
   };
@@ -82,8 +82,8 @@ function SalesPage() {
       if (error) throw error;
       toast.success("Venda excluída com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["sales"] });
-    } catch (error) {
-      toast.error("Erro ao excluir venda.");
+    } catch (error: any) {
+      toast.error(`Erro ao excluir venda: ${error.message || "Erro desconhecido"}`);
       console.error(error);
     }
   };

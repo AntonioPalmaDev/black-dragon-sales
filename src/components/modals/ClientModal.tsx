@@ -65,8 +65,8 @@ export function ClientModal({ isOpen, onClose, editingClient }: ClientModalProps
       queryClient.invalidateQueries({ queryKey: ["clients"] });
       onClose();
       form.reset();
-    } catch (error) {
-      toast.error(editingClient ? "Erro ao atualizar cliente." : "Erro ao cadastrar cliente.");
+    } catch (error: any) {
+      toast.error(editingClient ? `Erro ao atualizar cliente: ${error.message || "Erro desconhecido"}` : `Erro ao cadastrar cliente: ${error.message || "Erro desconhecido"}`);
       console.error(error);
     } finally {
       setIsSubmitting(false);

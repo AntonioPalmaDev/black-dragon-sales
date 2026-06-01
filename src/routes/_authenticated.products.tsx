@@ -66,8 +66,8 @@ function ProductsPage() {
       if (error) throw error;
       toast.success("Produto excluído com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["products"] });
-    } catch (error) {
-      toast.error("Erro ao excluir produto. Verifique se ele não possui vendas vinculadas.");
+    } catch (error: any) {
+      toast.error(`Erro ao excluir produto: ${error.message || "Erro desconhecido"}`);
       console.error(error);
     }
   };

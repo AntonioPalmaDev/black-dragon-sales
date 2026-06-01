@@ -77,8 +77,8 @@ export function ProductModal({ isOpen, onClose, editingProduct }: ProductModalPr
       queryClient.invalidateQueries({ queryKey: ["products"] });
       onClose();
       form.reset();
-    } catch (error) {
-      toast.error(editingProduct ? "Erro ao atualizar produto." : "Erro ao cadastrar produto.");
+    } catch (error: any) {
+      toast.error(editingProduct ? `Erro ao atualizar produto: ${error.message || "Erro desconhecido"}` : `Erro ao cadastrar produto: ${error.message || "Erro desconhecido"}`);
       console.error(error);
     } finally {
       setIsSubmitting(false);
