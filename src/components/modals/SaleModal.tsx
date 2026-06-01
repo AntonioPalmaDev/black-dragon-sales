@@ -110,7 +110,7 @@ export function SaleModal({ isOpen, onClose, editingSale }: SaleModalProps) {
   const watchedDiscount = form.watch("discount");
 
   const subtotal = watchedItems?.reduce((acc, item) => acc + (Number(item?.quantity || 0) * Number(item?.unit_price || 0)), 0) || 0;
-  const total = Math.max(0, subtotal - Number(watchedDiscount));
+  const total = Math.max(0, subtotal - Number(watchedDiscount || 0));
 
   const handleProductChange = (index: number, productId: string) => {
     const product = products?.find(p => p.id === productId);
