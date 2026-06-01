@@ -183,7 +183,15 @@ function DashboardPage() {
   );
 }
 
-function KPICard({ title, value, change, trend, icon: Icon }) {
+interface KPICardProps {
+  title: string;
+  value: string;
+  change: string;
+  trend: "up" | "down";
+  icon: any;
+}
+
+function KPICard({ title, value, change, trend, icon: Icon }: KPICardProps) {
   return (
     <Card className="bg-secondary border-border overflow-hidden relative">
       <div className="absolute top-0 right-0 p-4 opacity-10">
