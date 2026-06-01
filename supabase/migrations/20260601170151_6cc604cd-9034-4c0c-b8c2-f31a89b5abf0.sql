@@ -1,0 +1,1 @@
+ALTER TABLE public.clients ADD COLUMN type TEXT DEFAULT 'PF' CHECK (type IN ('PF', 'PJ'));
