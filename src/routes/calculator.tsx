@@ -9,7 +9,13 @@ import {
   Wallet, 
   TrendingUp,
   Lock,
-  ArrowRight
+  ArrowRight,
+  Wrench,
+  Hammer,
+  Gauge,
+  ShoppingCart,
+  Copy,
+  Minus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
