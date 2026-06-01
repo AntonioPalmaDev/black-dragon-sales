@@ -144,6 +144,7 @@ function ClientsPage() {
           </TableBody>
         </Table>
       </div>
+      <ClientModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 }
