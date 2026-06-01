@@ -15,7 +15,7 @@ import {
   History,
   FileText,
   Wallet,
-  LogSnapshot,
+  Terminal,
   User
 } from "lucide-react";
 import { useState } from "react";
