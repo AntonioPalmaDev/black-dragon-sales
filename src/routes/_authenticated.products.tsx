@@ -97,29 +97,26 @@ function ProductsPage() {
           <TableHeader className="bg-white/[0.01]">
             <TableRow className="hover:bg-transparent border-[#1F1F1F]">
               <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[#475569] h-12">Produto</TableHead>
-              <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[#475569] h-12">SKU</TableHead>
-              <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[#475569] h-12">Categoria</TableHead>
-              <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[#475569] h-12">Estoque</TableHead>
               <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[#475569] h-12">Preço Venda</TableHead>
+              <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[#475569] h-12">Status</TableHead>
               <TableHead className="text-right text-[10px] font-bold uppercase tracking-widest text-[#475569] h-12">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-10 text-muted-foreground">
+                <TableCell colSpan={4} className="text-center py-10 text-muted-foreground">
                   Carregando produtos...
                 </TableCell>
               </TableRow>
             ) : filteredProducts?.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-10 text-muted-foreground">
+                <TableCell colSpan={4} className="text-center py-10 text-muted-foreground">
                   Nenhum produto encontrado.
                 </TableCell>
               </TableRow>
             ) : (
               filteredProducts?.map((product) => {
-                const isLowStock = (product.stock_current ?? 0) <= (product.stock_min ?? 0);
                 return (
                   <TableRow key={product.id} className="hover:bg-white/[0.02] transition-colors border-[#1F1F1F] group cursor-pointer">
                     <TableCell>
@@ -130,20 +127,18 @@ function ProductsPage() {
                         <span className="font-bold text-white group-hover:text-[#FF1F3D] transition-colors">{product.name}</span>
                       </div>
                     </TableCell>
-                    <TableCell className="text-[#475569] font-mono text-xs">{product.sku || "-"}</TableCell>
-                    <TableCell className="text-[#94a3b8] text-xs font-medium">
-                      {product.categories?.name || "Sem categoria"}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <span className={cn("text-xs font-bold", isLowStock ? "text-[#FF1F3D]" : "text-white")}>
-                          {product.stock_current} {product.unit_measure}
-                        </span>
-                        {isLowStock && <AlertTriangle size={14} className="text-[#FF1F3D] animate-pulse" />}
-                      </div>
-                    </TableCell>
                     <TableCell className="text-white font-black text-sm">
                       {formatCurrency(product.sale_price ?? 0)}
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={cn(
+                        "font-bold uppercase tracking-widest text-[10px] px-3 py-1 rounded-full",
+                        product.is_active 
+                          ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" 
+                          : "bg-zinc-500/10 text-zinc-500 border-zinc-500/20"
+                      )} variant="outline">
+                        {product.is_active ? "ATIVO" : "INATIVO"}
+                      </Badge>
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
