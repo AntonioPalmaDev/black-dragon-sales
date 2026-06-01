@@ -174,7 +174,7 @@ function DashboardPage() {
                   contentStyle={{ backgroundColor: "#121212", border: "1px solid #1f2937" }}
                 />
                 <Line type="monotone" dataKey="revenue" stroke="#FF2E2E" strokeWidth={2} dot={{ fill: "#FF2E2E" }} />
-              </BarChart>
+              </LineChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
