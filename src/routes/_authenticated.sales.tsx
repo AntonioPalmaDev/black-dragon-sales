@@ -41,6 +41,7 @@ export const Route = createFileRoute("/_authenticated/sales")({
 function SalesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingSale, setEditingSale] = useState<any>(null);
   const queryClient = useQueryClient();
 
   const { data: sales, isLoading } = useQuery({
