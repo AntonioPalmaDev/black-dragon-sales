@@ -88,7 +88,7 @@ export function SaleModal({ isOpen, onClose, editingSale }: SaleModalProps) {
         
         if (!error && data) {
           replace(data.map(item => ({
-            product_id: item.product_id,
+            product_id: item.product_id || "",
             quantity: Number(item.quantity),
             unit_price: Number(item.unit_price)
           })));
