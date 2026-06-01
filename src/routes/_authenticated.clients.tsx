@@ -65,8 +65,8 @@ function ClientsPage() {
       if (error) throw error;
       toast.success("Cliente excluído com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["clients"] });
-    } catch (error) {
-      toast.error("Erro ao excluir cliente.");
+    } catch (error: any) {
+      toast.error(`Erro ao excluir cliente: ${error.message || "Erro desconhecido"}`);
       console.error(error);
     }
   };
