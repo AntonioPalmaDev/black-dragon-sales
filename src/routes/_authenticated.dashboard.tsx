@@ -414,7 +414,7 @@ function DashboardPage() {
                     </td>
                     <td className="px-6 py-4 text-xs text-[#475569]">{op.date}</td>
                     <td className="px-6 py-4">
-                      <span className={cn(
+                    <span className={cn(
                         "inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter border",
                         op.status === 'concluido' ? "bg-green-500/10 text-green-500 border-green-500/20" : 
                         op.status === 'cancelado' ? "bg-red-500/10 text-red-500 border-red-500/20" :
