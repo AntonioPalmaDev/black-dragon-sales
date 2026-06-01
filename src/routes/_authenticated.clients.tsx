@@ -9,8 +9,8 @@ import {
   MoreHorizontal, 
   Edit, 
   Trash2, 
-  UserPlus 
 } from "lucide-react";
+import { ClientModal } from "@/components/modals/ClientModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
