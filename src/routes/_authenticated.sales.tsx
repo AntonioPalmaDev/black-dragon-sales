@@ -11,6 +11,7 @@ import {
   XCircle,
   Calendar
 } from "lucide-react";
+import { SaleModal } from "@/components/modals/SaleModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
