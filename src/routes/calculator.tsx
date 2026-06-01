@@ -104,7 +104,7 @@ function CalculatorPage() {
   };
 
   const tuningsCost = Number(tuningValue) || 0;
-  const tuningsToCharge = tuningsCost * 1.2; // Assuming 20% margin as default for "margem padrão"
+  const tuningsToCharge = tuningsCost * 1.5; // 50% margin as requested
   
   const commonTotal = calculateCategoryTotal(ITENS_COMUNS, commonItems);
   const simpleTotal = calculateCategoryTotal(ACOES_SIMPLES, simpleActions);
