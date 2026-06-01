@@ -80,7 +80,7 @@ function DashboardPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("sale_items")
-        .select("*, products(name)");
+        .select("*, products(*)");
       if (error) throw error;
       return data;
     },
@@ -124,8 +124,18 @@ function DashboardPage() {
 
   // Calculate KPIs
   const totalFaturamento = filteredSales?.reduce((acc, sale) => acc + (sale.total_amount || 0), 0) || 0;
-  const totalReceitaLiquida = totalFaturamento * 0.8; // Exemplo: 80% do faturamento
-  const totalLucroLiquido = filteredSales?.reduce((acc, sale) => acc + (sale.net_profit || 0), 0) || 0;
+  
+  const totalLucroLiquido = saleItems?.reduce((acc, item) => {
+    const sale = filteredSales.find(s => s.id === item.sale_id);
+    if (sale) {
+      const product = item.products;
+      const cost = product?.cost_price || 0;
+      const price = item.unit_price || 0;
+      return acc + ((price - cost) * (item.quantity || 1));
+    }
+    return acc;
+  }, 0) || 0;
+
   const totalVendas = filteredSales?.length || 0;
   const ticketMedio = totalVendas > 0 ? totalFaturamento / totalVendas : 0;
   const clientesAtivos = clients?.filter(c => c.is_active).length || 0;
@@ -153,11 +163,25 @@ function DashboardPage() {
   const revenueData = eachDayOfInterval(chartInterval).map(date => {
     const daySales = filteredSales?.filter(sale => isSameDay(new Date(sale.created_at), date)) || [];
     const revenue = daySales.reduce((acc, sale) => acc + (sale.total_amount || 0), 0);
-    const netProfit = daySales.reduce((acc, sale) => acc + (sale.net_profit || 0), 0);
+    
+    // Calculate net profit based on items in those sales
+    const dayProfit = saleItems?.reduce((acc, item) => {
+      const sale = daySales.find(s => s.id === item.sale_id);
+      if (sale) {
+        // If we have product cost info, use it. 
+        // net_profit in sale might be 0 if not updated by trigger, so we calculate here
+        const product = item.products;
+        const cost = product?.cost_price || 0;
+        const price = item.unit_price || 0;
+        return acc + ((price - cost) * (item.quantity || 1));
+      }
+      return acc;
+    }, 0) || 0;
+
     return {
       name: format(date, "dd/MM"),
       revenue,
-      netProfit
+      netProfit: dayProfit
     };
   });
 
@@ -423,14 +447,14 @@ function DashboardPage() {
                   <div className="flex justify-between items-end">
                     <div className="flex flex-col">
                       <span className="text-[10px] text-[#475569] uppercase font-bold">Progresso</span>
-                      <span className="text-sm font-black text-white">{formatCurrency(totalReceitaLiquida)}</span>
+                      <span className="text-sm font-black text-white">{formatCurrency(totalLucroLiquido)}</span>
                     </div>
-                    <span className="text-[#FF1F3D] font-black text-xl">{Math.round((totalReceitaLiquida / 200000) * 100)}%</span>
+                    <span className="text-[#FF1F3D] font-black text-xl">{Math.round((totalLucroLiquido / 200000) * 100)}%</span>
                   </div>
                   <div className="h-2 w-full bg-[#0A0A0A] rounded-full overflow-hidden border border-[#1F1F1F]">
                     <div 
                       className="h-full bg-gradient-to-r from-[#FF1F3D] to-[#D91B34] shadow-[0_0_15px_rgba(255,31,61,0.5)] transition-all duration-1000" 
-                      style={{ width: `${Math.min(100, (totalReceitaLiquida / 200000) * 100)}%` }} 
+                      style={{ width: `${Math.min(100, (totalLucroLiquido / 200000) * 100)}%` }} 
                     />
                   </div>
                   <p className="text-[10px] text-[#475569] text-center italic">R$ 200.000,00 projetados para este mês</p>
@@ -464,8 +488,9 @@ function DashboardPage() {
       {/* KPI Grid - Now below the main chart */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4">
         <KPICard 
-          title="Receita Líquida" 
-          value={formatCurrency(totalReceitaLiquida)} 
+          title="Lucro Líquido" 
+          value={formatCurrency(totalLucroLiquido)} 
+
           change="+8.4%" 
           trend="up" 
           icon={Wallet} 
