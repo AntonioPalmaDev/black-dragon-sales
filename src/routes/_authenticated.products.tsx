@@ -169,6 +169,7 @@ function ProductsPage() {
           </TableBody>
         </Table>
       </div>
+      <ProductModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 }
