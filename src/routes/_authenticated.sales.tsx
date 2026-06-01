@@ -170,6 +170,7 @@ function SalesPage() {
           </TableBody>
         </Table>
       </div>
+      <SaleModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 }
