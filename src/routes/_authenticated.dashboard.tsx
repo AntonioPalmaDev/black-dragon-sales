@@ -291,6 +291,58 @@ function DashboardPage() {
           type="goal" 
         />
       </div>
+
+      {/* Recent Operations Table */}
+      <Card className="bg-[#111111] border-[#1F1F1F] shadow-2xl overflow-hidden">
+        <CardHeader className="flex flex-row items-center justify-between border-b border-white/[0.02] p-6">
+          <div>
+            <CardTitle className="text-xl font-bold text-white tracking-tight uppercase">Operações Recentes</CardTitle>
+            <p className="text-xs text-[#475569] mt-0.5">Últimas 10 movimentações do sistema</p>
+          </div>
+          <Button variant="outline" className="border-[#1F1F1F] bg-[#0A0A0A] text-[#FF1F3D] font-bold text-xs">
+            VER TODAS
+          </Button>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-[#1F1F1F] bg-white/[0.01]">
+                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-[#475569]">ID</th>
+                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-[#475569]">Cliente</th>
+                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-[#475569]">Produto</th>
+                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-[#475569]">Data/Hora</th>
+                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-[#475569]">Status</th>
+                  <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-[#475569] text-right">Valor</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#1F1F1F]">
+                {[...Array(5)].map((_, idx) => (
+                  <tr key={idx} className="group hover:bg-white/[0.02] transition-colors cursor-pointer">
+                    <td className="px-6 py-4 text-xs font-mono text-[#475569]">#8420{idx}</td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <div className="h-6 w-6 rounded-full bg-[#1A1A1A] border border-[#1F1F1F] flex items-center justify-center text-[10px] font-bold text-white">
+                          JD
+                        </div>
+                        <span className="text-xs font-bold text-white group-hover:text-[#FF1F3D] transition-colors">John Doe Enterprise</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-xs text-[#94a3b8]">Dragon Alpha Pro v2</td>
+                    <td className="px-6 py-4 text-xs text-[#475569]">Hoje às 14:45</td>
+                    <td className="px-6 py-4">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter bg-green-500/10 text-green-500 border border-green-500/20">
+                        Concluída
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-xs font-black text-white text-right">R$ 4.520,00</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
