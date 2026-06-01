@@ -360,14 +360,16 @@ export function SaleModal({ isOpen, onClose, editingSale }: SaleModalProps) {
                 <div className="w-32 relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-zinc-500">R$</span>
                   <FormField control={form.control} name="discount" render={({ field }) => (
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        step="0.01" 
-                        {...field} 
-                        className="bg-[#0A0A0A] border-[#1F1F1F] text-right font-mono h-9 rounded-lg pl-8 focus:border-[#FF1F3D]" 
-                      />
-                    </FormControl>
+                    <FormItem className="space-y-0">
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          step="0.01" 
+                          {...field} 
+                          className="bg-[#0A0A0A] border-[#1F1F1F] text-right font-mono h-9 rounded-lg pl-8 focus:border-[#FF1F3D]" 
+                        />
+                      </FormControl>
+                    </FormItem>
                   )} />
                 </div>
               </div>
