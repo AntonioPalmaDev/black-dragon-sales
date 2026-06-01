@@ -242,11 +242,23 @@ function DashboardPage() {
                 className="pl-10 w-[200px] md:w-[300px] bg-[#0A0A0A] border-[#1F1F1F] text-white focus:border-[#FF1F3D] focus:ring-1 focus:ring-[#FF1F3D] transition-all"
               />
             </div>
-            <Button variant="outline" className="border-[#1F1F1F] bg-[#0A0A0A] text-white hover:bg-white/5 h-10 px-4">
-              <Calendar className="mr-2 h-4 w-4 text-[#FF1F3D]" />
-              Últimos 30 dias
-              <ChevronDown className="ml-2 h-4 w-4 text-[#475569]" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="border-[#1F1F1F] bg-[#0A0A0A] text-white hover:bg-white/5 h-10 px-4">
+                  <Calendar className="mr-2 h-4 w-4 text-[#FF1F3D]" />
+                  {dateRange === "7d" ? "Últimos 7 dias" : 
+                   dateRange === "15d" ? "Últimos 15 dias" : 
+                   dateRange === "30d" ? "Últimos 30 dias" : "Mês Atual"}
+                  <ChevronDown className="ml-2 h-4 w-4 text-[#475569]" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-[#111111] border-[#1F1F1F] text-white">
+                <DropdownMenuItem onClick={() => setDateRange("7d")} className="hover:bg-white/5">Últimos 7 dias</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setDateRange("15d")} className="hover:bg-white/5">Últimos 15 dias</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setDateRange("30d")} className="hover:bg-white/5">Últimos 30 dias</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setDateRange("current_month")} className="hover:bg-white/5">Mês Atual</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button variant="outline" className="border-[#1F1F1F] bg-[#0A0A0A] text-white hover:bg-white/5 h-10 px-4">
               <Filter className="mr-2 h-4 w-4 text-[#FF1F3D]" />
               Filtros
