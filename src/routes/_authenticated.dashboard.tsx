@@ -153,11 +153,11 @@ function DashboardPage() {
   const revenueData = eachDayOfInterval(chartInterval).map(date => {
     const daySales = filteredSales?.filter(sale => isSameDay(new Date(sale.created_at), date)) || [];
     const revenue = daySales.reduce((acc, sale) => acc + (sale.total_amount || 0), 0);
-    const billing = revenue * 1.2; // Simulação de faturamento bruto vs líquido
+    const netProfit = daySales.reduce((acc, sale) => acc + (sale.net_profit || 0), 0);
     return {
       name: format(date, "dd/MM"),
       revenue,
-      billing
+      netProfit
     };
   });
 
@@ -310,7 +310,7 @@ function DashboardPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="h-2 w-2 rounded-full bg-[#475569]" />
-                  <span className="text-[10px] text-[#94a3b8] font-bold uppercase tracking-wider">Faturamento</span>
+                  <span className="text-[10px] text-[#94a3b8] font-bold uppercase tracking-wider">Lucro Líquido</span>
                 </div>
               </div>
             </div>
@@ -363,7 +363,7 @@ function DashboardPage() {
                   />
                   <Area 
                     type="monotone" 
-                    dataKey="billing" 
+                    dataKey="netProfit" 
                     stroke="#475569" 
                     strokeWidth={2}
                     strokeDasharray="5 5"
@@ -400,7 +400,7 @@ function DashboardPage() {
                     cursor={{ fill: 'rgba(255,31,61,0.1)' }}
                   />
                   <Bar dataKey="revenue" fill="#FF1F3D" radius={[4, 4, 0, 0]} barSize={20} />
-                  <Bar dataKey="billing" fill="#475569" radius={[4, 4, 0, 0]} barSize={20} />
+                  <Bar dataKey="netProfit" fill="#475569" radius={[4, 4, 0, 0]} barSize={20} />
                 </BarChart>
               )}
             </ResponsiveContainer>
