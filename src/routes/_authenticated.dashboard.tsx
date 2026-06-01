@@ -80,7 +80,7 @@ function DashboardPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("sale_items")
-        .select("*, products(name)");
+        .select("*, products(*)");
       if (error) throw error;
       return data;
     },
@@ -153,11 +153,25 @@ function DashboardPage() {
   const revenueData = eachDayOfInterval(chartInterval).map(date => {
     const daySales = filteredSales?.filter(sale => isSameDay(new Date(sale.created_at), date)) || [];
     const revenue = daySales.reduce((acc, sale) => acc + (sale.total_amount || 0), 0);
-    const netProfit = daySales.reduce((acc, sale) => acc + (sale.net_profit || 0), 0);
+    
+    // Calculate net profit based on items in those sales
+    const dayProfit = saleItems?.reduce((acc, item) => {
+      const sale = daySales.find(s => s.id === item.sale_id);
+      if (sale) {
+        // If we have product cost info, use it. 
+        // net_profit in sale might be 0 if not updated by trigger, so we calculate here
+        const product = item.products;
+        const cost = product?.cost_price || 0;
+        const price = item.unit_price || 0;
+        return acc + ((price - cost) * (item.quantity || 1));
+      }
+      return acc;
+    }, 0) || 0;
+
     return {
       name: format(date, "dd/MM"),
       revenue,
-      netProfit
+      netProfit: dayProfit
     };
   });
 
