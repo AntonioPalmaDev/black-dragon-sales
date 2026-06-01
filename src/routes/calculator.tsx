@@ -183,45 +183,45 @@ TOTAL GERAL: ${formatCurrency(totalGeral)}`;
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
             <div className="lg:col-span-2 space-y-6">
               {/* Itens Comuns */}
-              <Card className="bg-[#111111] border-[#1F1F1F]">
-                <CardHeader className="flex flex-row items-center gap-2 py-4">
-                  <Wrench className="h-5 w-5 text-[#FF1F3D]" />
-                  <CardTitle className="text-lg font-bold">Itens Comuns</CardTitle>
+              <Card className="bg-[#111111] border-[#1F1F1F] shadow-none">
+                <CardHeader className="flex flex-row items-center gap-2 py-4 border-b border-[#1F1F1F]/50">
+                  <Wrench className="h-4 w-4 text-[#FF1F3D]" />
+                  <CardTitle className="text-sm font-bold uppercase tracking-wider">Itens Comuns</CardTitle>
                 </CardHeader>
-                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4">
                   {ITENS_COMUNS.map((item) => (
-                    <div key={item.name} className="bg-[#0A0A0A] p-4 rounded-xl border border-[#1F1F1F] flex flex-col gap-3">
-                      <div className="flex justify-between items-center">
-                        <span className="font-semibold text-sm">{item.name}</span>
-                        <span className="text-[#94a3b8] text-xs">{formatCurrency(item.price)}</span>
+                    <div key={item.name} className="bg-[#0A0A0A] p-3 rounded-lg border border-[#1F1F1F] flex flex-col gap-2">
+                      <div className="flex flex-col">
+                        <span className="font-bold text-[13px] whitespace-nowrap overflow-hidden text-ellipsis">{item.name}</span>
+                        <span className="text-[#94a3b8] text-[11px] font-medium">{formatCurrency(item.price)}</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center bg-[#111111] rounded-lg border border-[#1F1F1F]">
+                      <div className="flex flex-col gap-2 mt-auto">
+                        <div className="flex items-center justify-between bg-[#111111] rounded border border-[#1F1F1F] h-8">
                           <Button 
                             variant="ghost" 
                             size="icon" 
-                            className="h-8 w-8 text-[#94a3b8] hover:text-[#FF1F3D]"
+                            className="h-full w-8 text-[#94a3b8] hover:text-[#FF1F3D] rounded-none"
                             onClick={() => updateQuantity('common', item.name, -1)}
                           >
-                            <Minus className="h-4 w-4" />
+                            <Minus className="h-3 w-3" />
                           </Button>
-                          <span className="w-8 text-center font-bold text-sm">
+                          <span className="text-xs font-bold w-6 text-center">
                             {commonItems[item.name] || 0}
                           </span>
                           <Button 
                             variant="ghost" 
                             size="icon" 
-                            className="h-8 w-8 text-[#94a3b8] hover:text-[#FF1F3D]"
+                            className="h-full w-8 text-[#94a3b8] hover:text-[#FF1F3D] rounded-none"
                             onClick={() => updateQuantity('common', item.name, 1)}
                           >
-                            <Plus className="h-4 w-4" />
+                            <Plus className="h-3 w-3" />
                           </Button>
                         </div>
                         <Button 
-                          className="flex-1 bg-[#1F1F1F] hover:bg-[#2A2A2A] text-white text-xs font-bold h-8"
+                          className="w-full bg-[#1F1F1F] hover:bg-[#2A2A2A] text-white text-[11px] font-bold h-7 rounded"
                           onClick={() => updateQuantity('common', item.name, 1)}
                         >
                           + Add
@@ -233,42 +233,42 @@ TOTAL GERAL: ${formatCurrency(totalGeral)}`;
               </Card>
 
               {/* Ações Simples */}
-              <Card className="bg-[#111111] border-[#1F1F1F]">
-                <CardHeader className="flex flex-row items-center gap-2 py-4">
-                  <Hammer className="h-5 w-5 text-[#FF1F3D]" />
-                  <CardTitle className="text-lg font-bold">Ações Simples</CardTitle>
+              <Card className="bg-[#111111] border-[#1F1F1F] shadow-none">
+                <CardHeader className="flex flex-row items-center gap-2 py-4 border-b border-[#1F1F1F]/50">
+                  <Hammer className="h-4 w-4 text-[#FF1F3D]" />
+                  <CardTitle className="text-sm font-bold uppercase tracking-wider">Ações Simples</CardTitle>
                 </CardHeader>
-                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4">
                   {ACOES_SIMPLES.map((item) => (
-                    <div key={item.name} className="bg-[#0A0A0A] p-4 rounded-xl border border-[#1F1F1F] flex flex-col gap-3">
-                      <div className="flex justify-between items-center">
-                        <span className="font-semibold text-sm">{item.name}</span>
-                        <span className="text-[#94a3b8] text-xs">{formatCurrency(item.price)}</span>
+                    <div key={item.name} className="bg-[#0A0A0A] p-3 rounded-lg border border-[#1F1F1F] flex flex-col gap-2">
+                      <div className="flex flex-col">
+                        <span className="font-bold text-[13px]">{item.name}</span>
+                        <span className="text-[#94a3b8] text-[11px] font-medium">{formatCurrency(item.price)}</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center bg-[#111111] rounded-lg border border-[#1F1F1F]">
+                      <div className="flex flex-col gap-2 mt-auto">
+                        <div className="flex items-center justify-between bg-[#111111] rounded border border-[#1F1F1F] h-8">
                           <Button 
                             variant="ghost" 
                             size="icon" 
-                            className="h-8 w-8 text-[#94a3b8] hover:text-[#FF1F3D]"
+                            className="h-full w-8 text-[#94a3b8] hover:text-[#FF1F3D] rounded-none"
                             onClick={() => updateQuantity('simple', item.name, -1)}
                           >
-                            <Minus className="h-4 w-4" />
+                            <Minus className="h-3 w-3" />
                           </Button>
-                          <span className="w-8 text-center font-bold text-sm">
+                          <span className="text-xs font-bold w-6 text-center">
                             {simpleActions[item.name] || 0}
                           </span>
                           <Button 
                             variant="ghost" 
                             size="icon" 
-                            className="h-8 w-8 text-[#94a3b8] hover:text-[#FF1F3D]"
+                            className="h-full w-8 text-[#94a3b8] hover:text-[#FF1F3D] rounded-none"
                             onClick={() => updateQuantity('simple', item.name, 1)}
                           >
-                            <Plus className="h-4 w-4" />
+                            <Plus className="h-3 w-3" />
                           </Button>
                         </div>
                         <Button 
-                          className="flex-1 bg-[#1F1F1F] hover:bg-[#2A2A2A] text-white text-xs font-bold h-8"
+                          className="w-full bg-[#1F1F1F] hover:bg-[#2A2A2A] text-white text-[11px] font-bold h-7 rounded"
                           onClick={() => updateQuantity('simple', item.name, 1)}
                         >
                           + Add
@@ -280,79 +280,85 @@ TOTAL GERAL: ${formatCurrency(totalGeral)}`;
               </Card>
 
               {/* Tunagens */}
-              <Card className="bg-[#111111] border-[#1F1F1F]">
-                <CardHeader className="flex flex-row items-center gap-2 py-4">
-                  <Gauge className="h-5 w-5 text-[#FF1F3D]" />
-                  <CardTitle className="text-lg font-bold">Tunagens</CardTitle>
+              <Card className="bg-[#111111] border-[#1F1F1F] shadow-none">
+                <CardHeader className="flex flex-row items-center gap-2 py-4 border-b border-[#1F1F1F]/50">
+                  <Gauge className="h-4 w-4 text-[#FF1F3D]" />
+                  <CardTitle className="text-sm font-bold uppercase tracking-wider">Tunagens</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="p-4 space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Valor do Painel</label>
+                    <label className="text-xs font-bold uppercase text-[#94a3b8]">Valor do Painel</label>
                     <Input 
                       placeholder="Ex: 50000"
                       type="number"
                       value={tuningValue}
                       onChange={(e) => setTuningValue(e.target.value)}
-                      className="bg-[#0A0A0A] border-[#1F1F1F] h-12 focus:border-[#FF1F3D]"
+                      className="bg-[#050505] border-[#1F1F1F] h-11 text-sm font-mono focus:border-[#FF1F3D] transition-colors"
                     />
-                    <p className="text-[#94a3b8] text-xs">Informe o valor exibido no painel do jogo. O valor cobrado ao cliente aplica a margem padrão.</p>
+                    <p className="text-[#475569] text-[10px] leading-relaxed italic">
+                      Informe o valor exibido no painel do jogo. O valor cobrado ao cliente aplica a margem padrão.
+                    </p>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-[#0A0A0A] p-4 rounded-xl border border-[#1F1F1F]">
-                      <p className="text-[#94a3b8] text-xs mb-1">Custo (Painel)</p>
-                      <p className="text-lg font-bold">{formatCurrency(tuningsCost)}</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-[#050505] p-3 px-4 rounded-lg border border-[#1F1F1F]">
+                      <p className="text-[#94a3b8] text-[10px] uppercase font-bold tracking-wider mb-1">Custo (Painel)</p>
+                      <p className="text-lg font-black font-mono">{formatCurrency(tuningsCost)}</p>
                     </div>
-                    <div className="bg-[#0A0A0A] p-4 rounded-xl border border-[#FF1F3D]/20">
-                      <p className="text-[#94a3b8] text-xs mb-1">Cobrar do Cliente</p>
-                      <p className="text-lg font-bold text-[#FF1F3D]">{formatCurrency(tuningsToCharge)}</p>
+                    <div className="bg-[#050505] p-3 px-4 rounded-lg border border-[#FF1F3D]/30">
+                      <p className="text-[#94a3b8] text-[10px] uppercase font-bold tracking-wider mb-1">Cobrar do Cliente</p>
+                      <p className="text-lg font-black font-mono text-[#FF1F3D]">{formatCurrency(tuningsToCharge)}</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            <div className="space-y-6">
+            <div className="lg:col-span-1">
               {/* Resumo */}
-              <Card className="bg-[#111111] border-[#1F1F1F] sticky top-8">
+              <Card className="bg-[#111111] border-[#1F1F1F] shadow-none lg:sticky lg:top-8">
                 <CardHeader className="flex flex-row items-center gap-2 py-4 border-b border-[#1F1F1F]">
-                  <ShoppingCart className="h-5 w-5 text-[#FF1F3D]" />
-                  <CardTitle className="text-lg font-bold">Resumo do Orçamento</CardTitle>
+                  <ShoppingCart className="h-4 w-4 text-[#FF1F3D]" />
+                  <CardTitle className="text-sm font-bold uppercase tracking-wider">Resumo do Orçamento</CardTitle>
                 </CardHeader>
-                <CardContent className="p-6 space-y-6">
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-[#94a3b8]">Tunagens</span>
-                      <span className="font-semibold">{formatCurrency(tuningsToCharge)}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-[#94a3b8]">Itens Comuns</span>
-                      <span className="font-semibold">{formatCurrency(commonTotal)}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-[#94a3b8]">Ações Simples</span>
-                      <span className="font-semibold">{formatCurrency(simpleTotal)}</span>
-                    </div>
-                  </div>
-                  <div className="pt-4 border-t border-[#1F1F1F]">
+                <CardContent className="p-5 space-y-5">
+                  <div className="space-y-4">
                     <div className="flex justify-between items-center">
-                      <span className="font-black uppercase tracking-wider text-xs">TOTAL GERAL</span>
-                      <span className="text-2xl font-black text-[#FF1F3D]">{formatCurrency(totalGeral)}</span>
+                      <span className="text-[#94a3b8] text-[13px] font-medium">Tunagens</span>
+                      <span className="font-bold text-[13px] font-mono">{formatCurrency(tuningsToCharge)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-[#94a3b8] text-[13px] font-medium">Itens Comuns</span>
+                      <span className="font-bold text-[13px] font-mono">{formatCurrency(commonTotal)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-[#94a3b8] text-[13px] font-medium">Ações Simples</span>
+                      <span className="font-bold text-[13px] font-mono">{formatCurrency(simpleTotal)}</span>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-3 pt-4">
-                    <Button 
-                      variant="outline" 
-                      onClick={handleClear}
-                      className="border-[#1F1F1F] hover:bg-[#1A1A1A] font-bold"
-                    >
-                      Limpar
-                    </Button>
-                    <Button 
-                      onClick={handleCopy}
-                      className="bg-[#FF1F3D] hover:bg-[#D91B34] font-bold"
-                    >
-                      <Copy className="mr-2 h-4 w-4" /> $ Copiar
-                    </Button>
+                  
+                  <div className="pt-5 border-t border-[#1F1F1F] flex flex-col gap-5">
+                    <div className="flex justify-between items-center">
+                      <span className="font-black text-[11px] uppercase tracking-widest text-white">TOTAL GERAL</span>
+                      <span className="text-2xl font-black text-[#FF1F3D] font-mono tracking-tighter">
+                        {formatCurrency(totalGeral)}
+                      </span>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button 
+                        variant="ghost" 
+                        onClick={handleClear}
+                        className="bg-[#0A0A0A] hover:bg-[#1A1A1A] text-white font-bold text-xs h-10 border border-[#1F1F1F]"
+                      >
+                        Limpar
+                      </Button>
+                      <Button 
+                        onClick={handleCopy}
+                        className="bg-[#FF1F3D] hover:bg-[#D91B34] text-white font-bold text-xs h-10 shadow-lg shadow-[#FF1F3D]/10"
+                      >
+                        <Copy className="mr-2 h-3 w-3" /> $ Copiar
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
