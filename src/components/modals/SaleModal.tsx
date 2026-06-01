@@ -32,7 +32,7 @@ interface SaleModalProps {
   editingSale?: any;
 }
 
-export function SaleModal({ isOpen, onClose }: SaleModalProps) {
+export function SaleModal({ isOpen, onClose, editingSale }: SaleModalProps) {
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -65,15 +65,51 @@ export function SaleModal({ isOpen, onClose }: SaleModalProps) {
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control: form.control,
     name: "items",
   });
 
+  useEffect(() => {
+    if (editingSale) {
+      form.reset({
+        client_id: editingSale.client_id || "",
+        payment_method: editingSale.payment_method || "dinheiro",
+        status: editingSale.status || "concluido",
+        discount: Number(editingSale.discount) || 0,
+      });
+
+      // Load items
+      const fetchItems = async () => {
+        const { data, error } = await supabase
+          .from("sale_items")
+          .select("product_id, quantity, unit_price")
+          .eq("sale_id", editingSale.id);
+        
+        if (!error && data) {
+          replace(data.map(item => ({
+            product_id: item.product_id,
+            quantity: Number(item.quantity),
+            unit_price: Number(item.unit_price)
+          })));
+        }
+      };
+      fetchItems();
+    } else {
+      form.reset({
+        client_id: "",
+        payment_method: "dinheiro",
+        status: "concluido",
+        discount: 0,
+        items: [{ product_id: "", quantity: 1, unit_price: 0 }],
+      });
+    }
+  }, [editingSale, isOpen, form, replace]);
+
   const watchedItems = form.watch("items");
   const watchedDiscount = form.watch("discount");
 
-  const subtotal = watchedItems.reduce((acc, item) => acc + (Number(item.quantity) * Number(item.unit_price)), 0);
+  const subtotal = watchedItems?.reduce((acc, item) => acc + (Number(item?.quantity || 0) * Number(item?.unit_price || 0)), 0) || 0;
   const total = Math.max(0, subtotal - Number(watchedDiscount));
 
   const handleProductChange = (index: number, productId: string) => {
