@@ -160,6 +160,7 @@ export function ProductModal({ isOpen, onClose, editingProduct }: ProductModalPr
                       type="number"
                       step="0.01"
                       {...field} 
+                      onChange={(e) => field.onChange(e.target.value === "" ? 0 : parseFloat(e.target.value))}
                       className="bg-[#111111] border-[#1F1F1F] h-12 pl-12 focus:border-[#FF1F3D] focus:ring-[#FF1F3D] transition-all rounded-xl" 
                     />
                   </div>
