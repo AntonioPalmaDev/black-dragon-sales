@@ -62,53 +62,55 @@ function SalesPage() {
     }).format(value);
   };
 
-  const getStatusBadge = (status: string) => {
+    const getStatusBadge = (status: string) => {
     switch (status) {
       case "concluido":
-        return <Badge className="bg-green-500/10 text-green-500 hover:bg-green-500/20">Concluída</Badge>;
+        return <Badge className="bg-green-500/10 text-green-500 border-green-500/20 text-[10px] font-bold uppercase tracking-tighter">Concluída</Badge>;
       case "pendente":
-        return <Badge className="bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20">Pendente</Badge>;
+        return <Badge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20 text-[10px] font-bold uppercase tracking-tighter">Pendente</Badge>;
       case "cancelado":
-        return <Badge className="bg-red-500/10 text-red-500 hover:bg-red-500/20">Cancelada</Badge>;
+        return <Badge className="bg-red-500/10 text-red-500 border-red-500/20 text-[10px] font-bold uppercase tracking-tighter">Cancelada</Badge>;
       default:
-        return <Badge>{status}</Badge>;
+        return <Badge className="text-[10px] font-bold uppercase tracking-tighter">{status}</Badge>;
     }
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="space-y-8 animate-in fade-in duration-1000">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-white">Vendas</h1>
-          <p className="text-muted-foreground">Monitore e registre suas operações comerciais.</p>
+          <h1 className="text-4xl font-black tracking-tighter text-white uppercase">
+            HISTÓRICO DE <span className="text-[#FF1F3D]">VENDAS</span>
+          </h1>
+          <p className="text-[#94a3b8] font-medium mt-1">Monitore e registre suas operações comerciais.</p>
         </div>
-        <Button className="bg-primary hover:bg-primary/90">
-          <Plus className="mr-2 h-4 w-4" /> Nova Venda
+        <Button className="bg-[#FF1F3D] hover:bg-[#D91B34] text-white font-bold px-6">
+          <Plus className="mr-2 h-4 w-4" /> NOVA VENDA
         </Button>
       </div>
 
-      <div className="flex items-center gap-4 bg-secondary p-4 rounded-xl border border-border">
+      <div className="flex items-center gap-4 bg-[#111111] p-3 rounded-xl border border-[#1F1F1F] shadow-2xl">
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#475569]" />
           <Input 
             placeholder="Pesquisar por número ou cliente..." 
-            className="pl-10 bg-black/20 border-border"
+            className="pl-10 bg-[#0A0A0A] border-none text-sm focus-visible:ring-1 focus-visible:ring-[#FF1F3D]"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-secondary overflow-hidden">
+      <div className="rounded-xl border border-[#1F1F1F] bg-[#111111] overflow-hidden shadow-2xl">
         <Table>
-          <TableHeader className="bg-black/20">
-            <TableRow>
-              <TableHead className="text-white">Nº Venda</TableHead>
-              <TableHead className="text-white">Data</TableHead>
-              <TableHead className="text-white">Cliente</TableHead>
-              <TableHead className="text-white">Valor Total</TableHead>
-              <TableHead className="text-white">Status</TableHead>
-              <TableHead className="text-right text-white">Ações</TableHead>
+          <TableHeader className="bg-white/[0.01]">
+            <TableRow className="hover:bg-transparent border-[#1F1F1F]">
+              <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[#475569] h-12">Nº Venda</TableHead>
+              <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[#475569] h-12">Data</TableHead>
+              <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[#475569] h-12">Cliente</TableHead>
+              <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[#475569] h-12">Valor Total</TableHead>
+              <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[#475569] h-12">Status</TableHead>
+              <TableHead className="text-right text-[10px] font-bold uppercase tracking-widest text-[#475569] h-12">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -126,16 +128,16 @@ function SalesPage() {
               </TableRow>
             ) : (
               filteredSales?.map((sale) => (
-                <TableRow key={sale.id} className="hover:bg-white/5 transition-colors">
-                  <TableCell className="font-mono text-sm text-primary">#{sale.sale_number}</TableCell>
-                  <TableCell className="text-muted-foreground">
+                <TableRow key={sale.id} className="hover:bg-white/[0.02] transition-colors border-[#1F1F1F] group cursor-pointer">
+                  <TableCell className="font-mono text-sm text-[#FF1F3D] font-bold">#{sale.sale_number}</TableCell>
+                  <TableCell className="text-[#475569] text-xs">
                     <div className="flex items-center gap-2">
-                      <Calendar size={14} />
+                      <Calendar size={12} className="text-[#475569]" />
                       {format(new Date(sale.created_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}
                     </div>
                   </TableCell>
-                  <TableCell className="text-white font-medium">{sale.clients?.name || "Consumidor Final"}</TableCell>
-                  <TableCell className="text-white font-bold">{formatCurrency(sale.total_amount ?? 0)}</TableCell>
+                  <TableCell className="text-white font-bold group-hover:text-[#FF1F3D] transition-colors">{sale.clients?.name || "Consumidor Final"}</TableCell>
+                  <TableCell className="text-white font-black">{formatCurrency(sale.total_amount ?? 0)}</TableCell>
                   <TableCell>{getStatusBadge(sale.status)}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
