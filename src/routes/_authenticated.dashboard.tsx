@@ -13,7 +13,9 @@ import {
   MoreVertical,
   Activity,
   ChevronDown,
-  Wallet
+  Wallet,
+  LayoutDashboard,
+  BarChart2
 } from "lucide-react";
 import { 
   AreaChart, 
@@ -33,8 +35,25 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, subDays } from "date-fns";
+import { 
+  format, 
+  startOfMonth, 
+  endOfMonth, 
+  eachDayOfInterval, 
+  isSameDay, 
+  subDays,
+  isWithinInterval,
+  startOfDay,
+  endOfDay
+} from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useState, useMemo } from "react";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
