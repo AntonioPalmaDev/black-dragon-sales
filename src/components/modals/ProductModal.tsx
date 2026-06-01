@@ -12,14 +12,16 @@ import { useQueryClient, useQuery } from "@tanstack/react-query";
 
 const formSchema = z.object({
   name: z.string().min(2, "Nome é obrigatório"),
-  sku: z.string().optional(),
-  category_id: z.string().optional(),
+  sku: z.string().optional().or(z.literal("")),
+  category_id: z.string().optional().or(z.literal("")),
   cost_price: z.coerce.number().min(0),
   sale_price: z.coerce.number().min(0),
   stock_current: z.coerce.number().int().min(0),
   stock_min: z.coerce.number().int().min(0),
-  unit_measure: z.string().default("UN"),
+  unit_measure: z.string().min(1, "Unidade é obrigatória"),
 });
+
+type ProductFormValues = z.infer<typeof formSchema>;
 
 interface ProductModalProps {
   isOpen: boolean;
@@ -38,12 +40,12 @@ export function ProductModal({ isOpen, onClose }: ProductModalProps) {
     },
   });
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<ProductFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       sku: "",
-      category_id: undefined,
+      category_id: "",
       cost_price: 0,
       sale_price: 0,
       stock_current: 0,
@@ -52,9 +54,16 @@ export function ProductModal({ isOpen, onClose }: ProductModalProps) {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: ProductFormValues) => {
     try {
-      const { error } = await supabase.from("products").insert([values]);
+      // Clean up empty strings for optional fields
+      const dataToInsert = {
+        ...values,
+        sku: values.sku || null,
+        category_id: values.category_id || null,
+      };
+
+      const { error } = await supabase.from("products").insert([dataToInsert]);
       if (error) throw error;
       toast.success("Produto cadastrado com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["products"] });
@@ -135,7 +144,7 @@ export function ProductModal({ isOpen, onClose }: ProductModalProps) {
               )} />
             </div>
             <DialogFooter>
-              <Button type="submit" className="bg-[#FF1F3D] hover:bg-[#D91B34] text-white">SALVAR</Button>
+              <Button type="submit" className="bg-[#FF1F3D] hover:bg-[#D91B34] text-white font-bold w-full sm:w-auto">SALVAR PRODUTO</Button>
             </DialogFooter>
           </form>
         </Form>
