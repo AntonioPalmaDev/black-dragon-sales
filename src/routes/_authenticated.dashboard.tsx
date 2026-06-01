@@ -330,11 +330,11 @@ function DashboardPage() {
               <div className="flex items-center gap-6 bg-[#0A0A0A] p-2 px-4 rounded-lg border border-[#1F1F1F]">
                 <div className="flex items-center gap-2">
                   <div className="h-2 w-2 rounded-full bg-[#FF1F3D] shadow-[0_0_5px_#FF1F3D]" />
-                  <span className="text-[10px] text-[#94a3b8] font-bold uppercase tracking-wider">Receita</span>
+                  <span className="text-[10px] text-[#94a3b8] font-bold uppercase tracking-wider">Receita Total</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="h-2 w-2 rounded-full bg-[#475569]" />
-                  <span className="text-[10px] text-[#94a3b8] font-bold uppercase tracking-wider">Lucro Líquido</span>
+                  <span className="text-[10px] text-[#94a3b8] font-bold uppercase tracking-wider">Lucro Final</span>
                 </div>
               </div>
             </div>
@@ -379,6 +379,7 @@ function DashboardPage() {
                   <Area 
                     type="monotone" 
                     dataKey="revenue" 
+                    name="Receita Total"
                     stroke="#FF1F3D" 
                     strokeWidth={4}
                     fillOpacity={1} 
@@ -388,6 +389,7 @@ function DashboardPage() {
                   <Area 
                     type="monotone" 
                     dataKey="netProfit" 
+                    name="Lucro Final"
                     stroke="#475569" 
                     strokeWidth={2}
                     strokeDasharray="5 5"
@@ -423,8 +425,8 @@ function DashboardPage() {
                     itemStyle={{ fontSize: "12px", fontWeight: "bold" }}
                     cursor={{ fill: 'rgba(255,31,61,0.1)' }}
                   />
-                  <Bar dataKey="revenue" fill="#FF1F3D" radius={[4, 4, 0, 0]} barSize={20} />
-                  <Bar dataKey="netProfit" fill="#475569" radius={[4, 4, 0, 0]} barSize={20} />
+                  <Bar dataKey="revenue" name="Receita Total" fill="#FF1F3D" radius={[4, 4, 0, 0]} barSize={20} />
+                  <Bar dataKey="netProfit" name="Lucro Final" fill="#475569" radius={[4, 4, 0, 0]} barSize={20} />
                 </BarChart>
               )}
             </ResponsiveContainer>
