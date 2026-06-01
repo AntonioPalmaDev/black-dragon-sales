@@ -118,20 +118,19 @@ function ClientsPage() {
               <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[#475569] h-12">Nome</TableHead>
               <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[#475569] h-12">Tipo</TableHead>
               <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[#475569] h-12">Status</TableHead>
-              <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[#475569] h-12">Status</TableHead>
               <TableHead className="text-right text-[10px] font-bold uppercase tracking-widest text-[#475569] h-12">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-10 text-muted-foreground">
+                <TableCell colSpan={4} className="text-center py-10 text-muted-foreground">
                   Carregando clientes...
                 </TableCell>
               </TableRow>
             ) : filteredClients?.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-10 text-muted-foreground">
+                <TableCell colSpan={4} className="text-center py-10 text-muted-foreground">
                   Nenhum cliente encontrado.
                 </TableCell>
               </TableRow>
