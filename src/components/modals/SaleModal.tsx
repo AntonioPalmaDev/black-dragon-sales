@@ -194,6 +194,7 @@ export function SaleModal({ isOpen, onClose, editingSale }: SaleModalProps) {
   };
 
   return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="bg-[#0A0A0A] border-[#1F1F1F] text-white sm:max-w-[800px] max-h-[95vh] p-0 overflow-hidden rounded-2xl flex flex-col">
         <div className="bg-[#111111] p-6 border-b border-[#1F1F1F]">
           <DialogHeader>
