@@ -167,109 +167,59 @@ function DashboardPage() {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-1000">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-white uppercase">
-            DASHBOARD <span className="text-[#FF1F3D]">EXECUTIVO</span>
-          </h1>
-          <p className="text-[#94a3b8] font-medium mt-1">
-            Análise de performance e receita da operação
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" className="border-[#1F1F1F] bg-[#111111] text-white hover:bg-white/5">
-            <Calendar className="mr-2 h-4 w-4 text-[#FF1F3D]" />
-            Últimos 30 dias
-          </Button>
-          <Button className="bg-[#FF1F3D] hover:bg-[#D91B34] text-white font-bold px-6">
-            EXPORTAR
-          </Button>
-        </div>
-      </div>
-
-      {/* KPI Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4">
-        <KPICard 
-          title="Receita Líquida" 
-          value={formatCurrency(totalReceitaLiquida)} 
-          change="+0%" 
-          trend="up" 
-          icon={Wallet} 
-        />
-        <KPICard 
-          title="Faturamento" 
-          value={formatCurrency(totalFaturamento)} 
-          change="+0%" 
-          trend="up" 
-          icon={TrendingUp} 
-        />
-        <KPICard 
-          title="Lucro Líquido" 
-          value={formatCurrency(totalLucroLiquido)} 
-          change="+0%" 
-          trend="up" 
-          icon={Activity} 
-        />
-        <KPICard 
-          title="Ticket Médio" 
-          value={formatCurrency(ticketMedio)} 
-          change="+0%" 
-          trend="up" 
-          icon={ShoppingCart} 
-        />
-        <KPICard 
-          title="Total Vendas" 
-          value={totalVendas.toString()} 
-          change="+0%" 
-          trend="up" 
-          icon={Package} 
-        />
-        <KPICard 
-          title="Clientes Ativos" 
-          value={clientesAtivos.toString()} 
-          change="+0%" 
-          trend="up" 
-          icon={Users} 
-        />
-        <KPICard 
-          title="Produtos Vendidos" 
-          value={produtosVendidos.toString()} 
-          change="+0%" 
-          trend="up" 
-          icon={Package} 
-        />
-        <KPICard 
-          title="Crescimento" 
-          value="+0%" 
-          change="vs. anterior" 
-          trend="up" 
-          icon={TrendingUp} 
-          isHighlight
-        />
-      </div>
-
-      {/* Main Chart Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
-        <Card className="lg:col-span-7 bg-[#111111] border-[#1F1F1F] shadow-2xl overflow-hidden group">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-white/[0.02]">
-            <div>
-              <CardTitle className="text-xl font-bold text-white tracking-tight">Movimentação de Receita Real</CardTitle>
-              <p className="text-xs text-[#475569] mt-0.5">Receita líquida + faturamento consolidado (Últimos 30 dias)</p>
+    <div className="space-y-6 animate-in fade-in duration-1000">
+      {/* Header Section with Filters */}
+      <div className="flex flex-col gap-6 bg-[#111111] p-6 border border-[#1F1F1F] rounded-xl shadow-2xl">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-white uppercase">
+              DASHBOARD <span className="text-[#FF1F3D]">EXECUTIVO</span>
+            </h1>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="relative group">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#475569] group-focus-within:text-[#FF1F3D] transition-colors" />
+              <Input 
+                placeholder="Buscar operação..." 
+                className="pl-10 w-[200px] md:w-[300px] bg-[#0A0A0A] border-[#1F1F1F] text-white focus:border-[#FF1F3D] focus:ring-1 focus:ring-[#FF1F3D] transition-all"
+              />
             </div>
-            <div className="flex items-center gap-4">
+            <Button variant="outline" className="border-[#1F1F1F] bg-[#0A0A0A] text-white hover:bg-white/5 h-10 px-4">
+              <Calendar className="mr-2 h-4 w-4 text-[#FF1F3D]" />
+              Últimos 30 dias
+              <ChevronDown className="ml-2 h-4 w-4 text-[#475569]" />
+            </Button>
+            <Button variant="outline" className="border-[#1F1F1F] bg-[#0A0A0A] text-white hover:bg-white/5 h-10 px-4">
+              <Filter className="mr-2 h-4 w-4 text-[#FF1F3D]" />
+              Filtros
+            </Button>
+            <Button className="bg-[#FF1F3D] hover:bg-[#D91B34] text-white font-bold h-10 px-6 shadow-[0_0_20px_rgba(255,31,61,0.2)]">
+              EXPORTAR
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Large Dashboard Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <Card className="lg:col-span-9 bg-[#111111] border-[#1F1F1F] shadow-2xl overflow-hidden group border-t-2 border-t-[#FF1F3D]">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-white/[0.02] bg-white/[0.01]">
+            <div>
+              <CardTitle className="text-xl font-bold text-white tracking-tight uppercase">Performance de Receita</CardTitle>
+              <p className="text-xs text-[#475569] mt-0.5">Análise consolidada de faturamento e lucro (30 dias)</p>
+            </div>
+            <div className="flex items-center gap-6 bg-[#0A0A0A] p-2 px-4 rounded-lg border border-[#1F1F1F]">
               <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-[#FF1F3D]" />
-                <span className="text-[10px] text-[#94a3b8] uppercase">Receita</span>
+                <div className="h-2 w-2 rounded-full bg-[#FF1F3D] shadow-[0_0_5px_#FF1F3D]" />
+                <span className="text-[10px] text-[#94a3b8] font-bold uppercase tracking-wider">Receita</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-[#475569]" />
-                <span className="text-[10px] text-[#94a3b8] uppercase">Faturamento</span>
+                <span className="text-[10px] text-[#94a3b8] font-bold uppercase tracking-wider">Faturamento</span>
               </div>
             </div>
           </CardHeader>
-          <CardContent className="pt-8 h-[400px]">
+          <CardContent className="pt-8 h-[500px]">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={revenueData}>
                 <defs>
@@ -292,16 +242,18 @@ function DashboardPage() {
                   fontSize={10} 
                   tickLine={false} 
                   axisLine={false}
-                  tickFormatter={(value) => `R$ ${value}`}
+                  tickFormatter={(value) => `R$ ${value >= 1000 ? (value/1000).toFixed(1) + 'k' : value}`}
                 />
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: "#0A0A0A", 
                     border: "1px solid #1F1F1F",
-                    borderRadius: "8px",
-                    boxShadow: "0 10px 30px rgba(0,0,0,0.5)"
+                    borderRadius: "12px",
+                    boxShadow: "0 20px 40px rgba(0,0,0,0.6)",
+                    color: "white"
                   }}
-                  itemStyle={{ fontSize: "12px" }}
+                  itemStyle={{ fontSize: "12px", fontWeight: "bold" }}
+                  cursor={{ stroke: '#FF1F3D', strokeWidth: 1 }}
                 />
                 <Area 
                   type="monotone" 
@@ -326,30 +278,118 @@ function DashboardPage() {
         </Card>
 
         <div className="lg:col-span-3 space-y-6">
-          <Card className="bg-[#111111] border-[#1F1F1F] h-full shadow-xl">
-            <CardHeader>
-              <CardTitle className="text-sm font-bold uppercase tracking-widest text-[#FF1F3D]">Métricas de Período</CardTitle>
+          <Card className="bg-[#111111] border-[#1F1F1F] shadow-xl border-l-2 border-l-[#FF1F3D]">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-bold uppercase tracking-widest text-[#FF1F3D]">Metas Globais</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
-              <StatRow label="Receita do Período" value={formatCurrency(totalReceitaLiquida)} />
-              <StatRow label="Média Diária" value={formatCurrency(totalReceitaLiquida / 30)} />
-              <StatRow label="Crescimento" value="+0%" isGreen />
+              <StatRow label="Faturamento Acumulado" value={formatCurrency(totalFaturamento)} />
+              <StatRow label="Ticket Médio" value={formatCurrency(ticketMedio)} />
+              <StatRow label="Produtividade" value="+12.5%" isGreen />
               
               <div className="pt-6 border-t border-[#1F1F1F]">
-                <p className="text-[10px] uppercase font-bold text-[#475569] mb-4">Meta Mensal</p>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-white">{formatCurrency(totalReceitaLiquida)} / R$ 200.000</span>
-                    <span className="text-[#FF1F3D] font-bold">{Math.round((totalReceitaLiquida / 200000) * 100)}%</span>
+                <p className="text-[10px] uppercase font-bold text-[#475569] mb-4 tracking-widest">Meta de Vendas</p>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-end">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] text-[#475569] uppercase font-bold">Progresso</span>
+                      <span className="text-sm font-black text-white">{formatCurrency(totalReceitaLiquida)}</span>
+                    </div>
+                    <span className="text-[#FF1F3D] font-black text-xl">{Math.round((totalReceitaLiquida / 200000) * 100)}%</span>
                   </div>
-                  <div className="h-1.5 w-full bg-[#1A1A1A] rounded-full overflow-hidden">
-                    <div className="h-full bg-[#FF1F3D] shadow-[0_0_10px_rgba(255,31,61,0.5)]" style={{ width: `${Math.min(100, (totalReceitaLiquida / 200000) * 100)}%` }} />
+                  <div className="h-2 w-full bg-[#0A0A0A] rounded-full overflow-hidden border border-[#1F1F1F]">
+                    <div 
+                      className="h-full bg-gradient-to-r from-[#FF1F3D] to-[#D91B34] shadow-[0_0_15px_rgba(255,31,61,0.5)] transition-all duration-1000" 
+                      style={{ width: `${Math.min(100, (totalReceitaLiquida / 200000) * 100)}%` }} 
+                    />
                   </div>
+                  <p className="text-[10px] text-[#475569] text-center italic">R$ 200.000,00 projetados para este mês</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-[#111111] border-[#1F1F1F] shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-3 opacity-10">
+              <Activity className="h-12 w-12 text-[#FF1F3D]" />
+            </div>
+            <CardContent className="p-6">
+              <p className="text-[10px] font-bold text-[#475569] uppercase tracking-widest mb-1">Status da Operação</p>
+              <h3 className="text-xl font-black text-white uppercase mb-4">Saudável</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-[10px] text-[#475569] uppercase font-medium">Uptime</p>
+                  <p className="text-xs font-bold text-white">99.9%</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-[#475569] uppercase font-medium">Sincronia</p>
+                  <p className="text-xs font-bold text-green-500">Real-time</p>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
+      </div>
+
+      {/* KPI Grid - Now below the main chart */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4">
+        <KPICard 
+          title="Receita Líquida" 
+          value={formatCurrency(totalReceitaLiquida)} 
+          change="+8.4%" 
+          trend="up" 
+          icon={Wallet} 
+        />
+        <KPICard 
+          title="Faturamento" 
+          value={formatCurrency(totalFaturamento)} 
+          change="+12.1%" 
+          trend="up" 
+          icon={TrendingUp} 
+        />
+        <KPICard 
+          title="Lucro Líquido" 
+          value={formatCurrency(totalLucroLiquido)} 
+          change="+5.2%" 
+          trend="up" 
+          icon={Activity} 
+        />
+        <KPICard 
+          title="Ticket Médio" 
+          value={formatCurrency(ticketMedio)} 
+          change="-2.4%" 
+          trend="down" 
+          icon={ShoppingCart} 
+        />
+        <KPICard 
+          title="Total Vendas" 
+          value={totalVendas.toString()} 
+          change="+15%" 
+          trend="up" 
+          icon={Package} 
+        />
+        <KPICard 
+          title="Clientes Ativos" 
+          value={clientesAtivos.toString()} 
+          change="+4" 
+          trend="up" 
+          icon={Users} 
+        />
+        <KPICard 
+          title="Produtos Vendidos" 
+          value={produtosVendidos.toString()} 
+          change="+42" 
+          trend="up" 
+          icon={Package} 
+        />
+        <KPICard 
+          title="ROI Médio" 
+          value="3.2x" 
+          change="vs. anterior" 
+          trend="up" 
+          icon={TrendingUp} 
+          isHighlight
+        />
       </div>
 
       {/* Second Line Indicators */}
