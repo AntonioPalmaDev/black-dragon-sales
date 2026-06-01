@@ -13,7 +13,9 @@ import {
   MoreVertical,
   Activity,
   ChevronDown,
-  Wallet
+  Wallet,
+  LayoutDashboard,
+  BarChart2
 } from "lucide-react";
 import { 
   AreaChart, 
@@ -33,14 +35,34 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, subDays } from "date-fns";
+import { 
+  format, 
+  startOfMonth, 
+  endOfMonth, 
+  eachDayOfInterval, 
+  isSameDay, 
+  subDays,
+  isWithinInterval,
+  startOfDay,
+  endOfDay
+} from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useState, useMemo } from "react";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
 });
 
 function DashboardPage() {
+  const [dateRange, setDateRange] = useState<"7d" | "15d" | "30d" | "current_month">("current_month");
+  const [chartType, setChartType] = useState<"area" | "bar">("area");
+
   const { data: sales, isLoading: isLoadingSales } = useQuery({
     queryKey: ["dashboard-sales"],
     queryFn: async () => {
@@ -75,25 +97,61 @@ function DashboardPage() {
     },
   });
 
+  const filteredSales = useMemo(() => {
+    if (!sales) return [];
+    const now = new Date();
+    let start: Date;
+    let end: Date = endOfDay(now);
+
+    if (dateRange === "7d") {
+      start = startOfDay(subDays(now, 6));
+    } else if (dateRange === "15d") {
+      start = startOfDay(subDays(now, 14));
+    } else if (dateRange === "30d") {
+      start = startOfDay(subDays(now, 29));
+    } else {
+      start = startOfMonth(now);
+      end = endOfMonth(now);
+    }
+
+    return sales.filter(sale => {
+      const saleDate = new Date(sale.created_at);
+      return isWithinInterval(saleDate, { start, end });
+    });
+  }, [sales, dateRange]);
+
   const isLoading = isLoadingSales || isLoadingItems || isLoadingClients;
 
   // Calculate KPIs
-  const totalFaturamento = sales?.reduce((acc, sale) => acc + (sale.total_amount || 0), 0) || 0;
+  const totalFaturamento = filteredSales?.reduce((acc, sale) => acc + (sale.total_amount || 0), 0) || 0;
   const totalReceitaLiquida = totalFaturamento * 0.8; // Exemplo: 80% do faturamento
-  const totalLucroLiquido = sales?.reduce((acc, sale) => acc + (sale.net_profit || 0), 0) || 0;
-  const totalVendas = sales?.length || 0;
+  const totalLucroLiquido = filteredSales?.reduce((acc, sale) => acc + (sale.net_profit || 0), 0) || 0;
+  const totalVendas = filteredSales?.length || 0;
   const ticketMedio = totalVendas > 0 ? totalFaturamento / totalVendas : 0;
   const clientesAtivos = clients?.filter(c => c.is_active).length || 0;
-  const produtosVendidos = saleItems?.reduce((acc, item) => acc + (item.quantity || 0), 0) || 0;
+  const produtosVendidos = saleItems?.reduce((acc, item) => {
+    // Check if item belongs to a filtered sale
+    const sale = filteredSales.find(s => s.id === item.sale_id);
+    if (sale) return acc + (item.quantity || 0);
+    return acc;
+  }, 0) || 0;
 
-  // Revenue Chart Data (last 7 days for simplicity, or 30 days)
-  const last30Days = eachDayOfInterval({
-    start: subDays(new Date(), 29),
-    end: new Date(),
-  });
+  // Revenue Chart Data
+  const chartInterval = useMemo(() => {
+    const now = new Date();
+    if (dateRange === "7d") {
+      return { start: subDays(now, 6), end: now };
+    } else if (dateRange === "15d") {
+      return { start: subDays(now, 14), end: now };
+    } else if (dateRange === "30d") {
+      return { start: subDays(now, 29), end: now };
+    } else {
+      return { start: startOfMonth(now), end: endOfMonth(now) };
+    }
+  }, [dateRange]);
 
-  const revenueData = last30Days.map(date => {
-    const daySales = sales?.filter(sale => isSameDay(new Date(sale.created_at), date)) || [];
+  const revenueData = eachDayOfInterval(chartInterval).map(date => {
+    const daySales = filteredSales?.filter(sale => isSameDay(new Date(sale.created_at), date)) || [];
     const revenue = daySales.reduce((acc, sale) => acc + (sale.total_amount || 0), 0);
     const billing = revenue * 1.2; // Simulação de faturamento bruto vs líquido
     return {
@@ -184,11 +242,23 @@ function DashboardPage() {
                 className="pl-10 w-[200px] md:w-[300px] bg-[#0A0A0A] border-[#1F1F1F] text-white focus:border-[#FF1F3D] focus:ring-1 focus:ring-[#FF1F3D] transition-all"
               />
             </div>
-            <Button variant="outline" className="border-[#1F1F1F] bg-[#0A0A0A] text-white hover:bg-white/5 h-10 px-4">
-              <Calendar className="mr-2 h-4 w-4 text-[#FF1F3D]" />
-              Últimos 30 dias
-              <ChevronDown className="ml-2 h-4 w-4 text-[#475569]" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="border-[#1F1F1F] bg-[#0A0A0A] text-white hover:bg-white/5 h-10 px-4">
+                  <Calendar className="mr-2 h-4 w-4 text-[#FF1F3D]" />
+                  {dateRange === "7d" ? "Últimos 7 dias" : 
+                   dateRange === "15d" ? "Últimos 15 dias" : 
+                   dateRange === "30d" ? "Últimos 30 dias" : "Mês Atual"}
+                  <ChevronDown className="ml-2 h-4 w-4 text-[#475569]" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-[#111111] border-[#1F1F1F] text-white">
+                <DropdownMenuItem onClick={() => setDateRange("7d")} className="hover:bg-white/5">Últimos 7 dias</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setDateRange("15d")} className="hover:bg-white/5">Últimos 15 dias</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setDateRange("30d")} className="hover:bg-white/5">Últimos 30 dias</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setDateRange("current_month")} className="hover:bg-white/5">Mês Atual</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button variant="outline" className="border-[#1F1F1F] bg-[#0A0A0A] text-white hover:bg-white/5 h-10 px-4">
               <Filter className="mr-2 h-4 w-4 text-[#FF1F3D]" />
               Filtros
@@ -206,73 +276,133 @@ function DashboardPage() {
           <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-white/[0.02] bg-white/[0.01]">
             <div>
               <CardTitle className="text-xl font-bold text-white tracking-tight uppercase">Performance de Receita</CardTitle>
-              <p className="text-xs text-[#475569] mt-0.5">Análise consolidada de faturamento e lucro (30 dias)</p>
+              <p className="text-xs text-[#475569] mt-0.5">
+                Análise consolidada de faturamento e lucro ({
+                  dateRange === "7d" ? "7 dias" : 
+                  dateRange === "15d" ? "15 dias" : 
+                  dateRange === "30d" ? "30 dias" : "Mês Atual"
+                })
+              </p>
             </div>
-            <div className="flex items-center gap-6 bg-[#0A0A0A] p-2 px-4 rounded-lg border border-[#1F1F1F]">
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-[#FF1F3D] shadow-[0_0_5px_#FF1F3D]" />
-                <span className="text-[10px] text-[#94a3b8] font-bold uppercase tracking-wider">Receita</span>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1 bg-[#0A0A0A] p-1 rounded-lg border border-[#1F1F1F]">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setChartType("area")}
+                  className={cn("h-8 px-2", chartType === "area" ? "bg-[#FF1F3D] text-white" : "text-[#475569]")}
+                >
+                  <Activity className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setChartType("bar")}
+                  className={cn("h-8 px-2", chartType === "bar" ? "bg-[#FF1F3D] text-white" : "text-[#475569]")}
+                >
+                  <BarChart2 className="h-4 w-4" />
+                </Button>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-[#475569]" />
-                <span className="text-[10px] text-[#94a3b8] font-bold uppercase tracking-wider">Faturamento</span>
+              <div className="flex items-center gap-6 bg-[#0A0A0A] p-2 px-4 rounded-lg border border-[#1F1F1F]">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-[#FF1F3D] shadow-[0_0_5px_#FF1F3D]" />
+                  <span className="text-[10px] text-[#94a3b8] font-bold uppercase tracking-wider">Receita</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-[#475569]" />
+                  <span className="text-[10px] text-[#94a3b8] font-bold uppercase tracking-wider">Faturamento</span>
+                </div>
               </div>
             </div>
           </CardHeader>
           <CardContent className="pt-8 h-[500px]">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={revenueData}>
-                <defs>
-                  <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#FF1F3D" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#FF1F3D" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1F1F1F" vertical={false} />
-                <XAxis 
-                  dataKey="name" 
-                  stroke="#475569" 
-                  fontSize={10} 
-                  tickLine={false} 
-                  axisLine={false}
-                  dy={10}
-                />
-                <YAxis 
-                  stroke="#475569" 
-                  fontSize={10} 
-                  tickLine={false} 
-                  axisLine={false}
-                  tickFormatter={(value) => `R$ ${value >= 1000 ? (value/1000).toFixed(1) + 'k' : value}`}
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: "#0A0A0A", 
-                    border: "1px solid #1F1F1F",
-                    borderRadius: "12px",
-                    boxShadow: "0 20px 40px rgba(0,0,0,0.6)",
-                    color: "white"
-                  }}
-                  itemStyle={{ fontSize: "12px", fontWeight: "bold" }}
-                  cursor={{ stroke: '#FF1F3D', strokeWidth: 1 }}
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="revenue" 
-                  stroke="#FF1F3D" 
-                  strokeWidth={4}
-                  fillOpacity={1} 
-                  fill="url(#colorRevenue)" 
-                  animationDuration={2000}
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="billing" 
-                  stroke="#475569" 
-                  strokeWidth={2}
-                  strokeDasharray="5 5"
-                  fill="transparent"
-                />
-              </AreaChart>
+              {chartType === "area" ? (
+                <AreaChart data={revenueData}>
+                  <defs>
+                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#FF1F3D" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#FF1F3D" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1F1F1F" vertical={false} />
+                  <XAxis 
+                    dataKey="name" 
+                    stroke="#475569" 
+                    fontSize={10} 
+                    tickLine={false} 
+                    axisLine={false}
+                    dy={10}
+                  />
+                  <YAxis 
+                    stroke="#475569" 
+                    fontSize={10} 
+                    tickLine={false} 
+                    axisLine={false}
+                    tickFormatter={(value) => `R$ ${value >= 1000 ? (value/1000).toFixed(1) + 'k' : value}`}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: "#0A0A0A", 
+                      border: "1px solid #1F1F1F",
+                      borderRadius: "12px",
+                      boxShadow: "0 20px 40px rgba(0,0,0,0.6)",
+                      color: "white"
+                    }}
+                    itemStyle={{ fontSize: "12px", fontWeight: "bold" }}
+                    cursor={{ stroke: '#FF1F3D', strokeWidth: 1 }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="revenue" 
+                    stroke="#FF1F3D" 
+                    strokeWidth={4}
+                    fillOpacity={1} 
+                    fill="url(#colorRevenue)" 
+                    animationDuration={2000}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="billing" 
+                    stroke="#475569" 
+                    strokeWidth={2}
+                    strokeDasharray="5 5"
+                    fill="transparent"
+                  />
+                </AreaChart>
+              ) : (
+                <BarChart data={revenueData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1F1F1F" vertical={false} />
+                  <XAxis 
+                    dataKey="name" 
+                    stroke="#475569" 
+                    fontSize={10} 
+                    tickLine={false} 
+                    axisLine={false}
+                    dy={10}
+                  />
+                  <YAxis 
+                    stroke="#475569" 
+                    fontSize={10} 
+                    tickLine={false} 
+                    axisLine={false}
+                    tickFormatter={(value) => `R$ ${value >= 1000 ? (value/1000).toFixed(1) + 'k' : value}`}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: "#0A0A0A", 
+                      border: "1px solid #1F1F1F",
+                      borderRadius: "12px",
+                      boxShadow: "0 20px 40px rgba(0,0,0,0.6)",
+                      color: "white"
+                    }}
+                    itemStyle={{ fontSize: "12px", fontWeight: "bold" }}
+                    cursor={{ fill: 'rgba(255,31,61,0.1)' }}
+                  />
+                  <Bar dataKey="revenue" fill="#FF1F3D" radius={[4, 4, 0, 0]} barSize={20} />
+                  <Bar dataKey="billing" fill="#475569" radius={[4, 4, 0, 0]} barSize={20} />
+                </BarChart>
+              )}
             </ResponsiveContainer>
           </CardContent>
         </Card>
