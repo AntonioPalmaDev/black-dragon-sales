@@ -276,7 +276,13 @@ function DashboardPage() {
           <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-white/[0.02] bg-white/[0.01]">
             <div>
               <CardTitle className="text-xl font-bold text-white tracking-tight uppercase">Performance de Receita</CardTitle>
-              <p className="text-xs text-[#475569] mt-0.5">Análise consolidada de faturamento e lucro (30 dias)</p>
+              <p className="text-xs text-[#475569] mt-0.5">
+                Análise consolidada de faturamento e lucro ({
+                  dateRange === "7d" ? "7 dias" : 
+                  dateRange === "15d" ? "15 dias" : 
+                  dateRange === "30d" ? "30 dias" : "Mês Atual"
+                })
+              </p>
             </div>
             <div className="flex items-center gap-6 bg-[#0A0A0A] p-2 px-4 rounded-lg border border-[#1F1F1F]">
               <div className="flex items-center gap-2">
