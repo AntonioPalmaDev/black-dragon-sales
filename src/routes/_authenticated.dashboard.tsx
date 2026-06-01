@@ -284,14 +284,34 @@ function DashboardPage() {
                 })
               </p>
             </div>
-            <div className="flex items-center gap-6 bg-[#0A0A0A] p-2 px-4 rounded-lg border border-[#1F1F1F]">
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-[#FF1F3D] shadow-[0_0_5px_#FF1F3D]" />
-                <span className="text-[10px] text-[#94a3b8] font-bold uppercase tracking-wider">Receita</span>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1 bg-[#0A0A0A] p-1 rounded-lg border border-[#1F1F1F]">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setChartType("area")}
+                  className={cn("h-8 px-2", chartType === "area" ? "bg-[#FF1F3D] text-white" : "text-[#475569]")}
+                >
+                  <Activity className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setChartType("bar")}
+                  className={cn("h-8 px-2", chartType === "bar" ? "bg-[#FF1F3D] text-white" : "text-[#475569]")}
+                >
+                  <BarChart2 className="h-4 w-4" />
+                </Button>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-[#475569]" />
-                <span className="text-[10px] text-[#94a3b8] font-bold uppercase tracking-wider">Faturamento</span>
+              <div className="flex items-center gap-6 bg-[#0A0A0A] p-2 px-4 rounded-lg border border-[#1F1F1F]">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-[#FF1F3D] shadow-[0_0_5px_#FF1F3D]" />
+                  <span className="text-[10px] text-[#94a3b8] font-bold uppercase tracking-wider">Receita</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-[#475569]" />
+                  <span className="text-[10px] text-[#94a3b8] font-bold uppercase tracking-wider">Faturamento</span>
+                </div>
               </div>
             </div>
           </CardHeader>
