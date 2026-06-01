@@ -185,8 +185,8 @@ export function SaleModal({ isOpen, onClose, editingSale }: SaleModalProps) {
       queryClient.invalidateQueries({ queryKey: ["products"] });
       onClose();
       form.reset();
-    } catch (error) {
-      toast.error("Erro ao processar operação.");
+    } catch (error: any) {
+      toast.error(`Erro ao processar operação: ${error.message || "Erro desconhecido"}`);
       console.error(error);
     } finally {
       setIsSubmitting(false);
