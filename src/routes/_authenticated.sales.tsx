@@ -86,7 +86,10 @@ function SalesPage() {
           </h1>
           <p className="text-[#94a3b8] font-medium mt-1">Monitore e registre suas operações comerciais.</p>
         </div>
-        <Button className="bg-[#FF1F3D] hover:bg-[#D91B34] text-white font-bold px-6">
+        <Button 
+          onClick={() => setIsModalOpen(true)}
+          className="bg-[#FF1F3D] hover:bg-[#D91B34] text-white font-bold px-6"
+        >
           <Plus className="mr-2 h-4 w-4" /> NOVA VENDA
         </Button>
       </div>
