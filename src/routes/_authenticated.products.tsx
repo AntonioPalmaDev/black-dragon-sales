@@ -12,6 +12,7 @@ import {
   Package,
   AlertTriangle
 } from "lucide-react";
+import { ProductModal } from "@/components/modals/ProductModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -36,6 +37,7 @@ export const Route = createFileRoute("/_authenticated/products")({
 
 function ProductsPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { data: products, isLoading } = useQuery({
     queryKey: ["products"],
@@ -70,7 +72,10 @@ function ProductsPage() {
           </h1>
           <p className="text-[#94a3b8] font-medium mt-1">Gerencie seu inventário e níveis de estoque.</p>
         </div>
-        <Button className="bg-[#FF1F3D] hover:bg-[#D91B34] text-white font-bold px-6">
+        <Button 
+          onClick={() => setIsModalOpen(true)}
+          className="bg-[#FF1F3D] hover:bg-[#D91B34] text-white font-bold px-6"
+        >
           <Plus className="mr-2 h-4 w-4" /> NOVO PRODUTO
         </Button>
       </div>
@@ -164,6 +169,7 @@ function ProductsPage() {
           </TableBody>
         </Table>
       </div>
+      <ProductModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 }
