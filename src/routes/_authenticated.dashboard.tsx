@@ -454,7 +454,7 @@ function DashboardPage() {
                   <div className="h-2 w-full bg-[#0A0A0A] rounded-full overflow-hidden border border-[#1F1F1F]">
                     <div 
                       className="h-full bg-gradient-to-r from-[#FF1F3D] to-[#D91B34] shadow-[0_0_15px_rgba(255,31,61,0.5)] transition-all duration-1000" 
-                      style={{ width: `${Math.min(100, (totalReceitaLiquida / 200000) * 100)}%` }} 
+                      style={{ width: `${Math.min(100, (totalLucroLiquido / 200000) * 100)}%` }} 
                     />
                   </div>
                   <p className="text-[10px] text-[#475569] text-center italic">R$ 200.000,00 projetados para este mês</p>
@@ -488,8 +488,9 @@ function DashboardPage() {
       {/* KPI Grid - Now below the main chart */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4">
         <KPICard 
-          title="Receita Líquida" 
-          value={formatCurrency(totalReceitaLiquida)} 
+          title="Lucro Líquido" 
+          value={formatCurrency(totalLucroLiquido)} 
+
           change="+8.4%" 
           trend="up" 
           icon={Wallet} 
