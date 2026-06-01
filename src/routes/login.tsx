@@ -53,24 +53,24 @@ function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="w-full max-w-md space-y-8 animate-in fade-in zoom-in duration-500">
+    <div className="flex min-h-screen items-center justify-center bg-[#050505] px-4 font-sans">
+      <div className="w-full max-w-md space-y-8 animate-in fade-in zoom-in duration-700">
         <div className="text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-primary rotate-45 mb-4 shadow-lg shadow-primary/20">
-            <div className="size-4 bg-background rounded-full" />
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-xl bg-[#FF1F3D] shadow-[0_0_30px_rgba(255,31,61,0.3)] mb-6">
+            <span className="font-display text-2xl font-black text-white">BD</span>
           </div>
-          <h1 className="font-display text-4xl font-bold uppercase tracking-tighter text-white">
-            BLACK DRAGONS
+          <h1 className="font-display text-4xl font-black uppercase tracking-tighter text-white">
+            BLACK <span className="text-[#FF1F3D]">DRAGONS</span>
           </h1>
-          <p className="mt-2 text-muted-foreground">
+          <p className="mt-2 text-[#94a3b8] font-medium">
             Acesse sua central de comando de vendas.
           </p>
         </div>
 
-        <div className="rounded-2xl border border-border bg-secondary p-8 shadow-2xl">
+        <div className="rounded-2xl border border-[#1F1F1F] bg-[#111111] p-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-xs font-bold uppercase tracking-widest text-[#475569]">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -78,13 +78,13 @@ function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="bg-black/20 border-border"
+                className="bg-[#0A0A0A] border-[#1F1F1F] text-white focus-visible:ring-[#FF1F3D] h-12"
               />
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Senha</Label>
-                <Link to="/forgot-password" data-size="sm" className="text-xs text-primary hover:underline">
+                <Label htmlFor="password" className="text-xs font-bold uppercase tracking-widest text-[#475569]">Senha</Label>
+                <Link to="/forgot-password" data-size="sm" className="text-xs text-[#FF1F3D] hover:underline font-bold">
                   Esqueceu a senha?
                 </Link>
               </div>
@@ -94,14 +94,14 @@ function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="bg-black/20 border-border"
+                className="bg-[#0A0A0A] border-[#1F1F1F] text-white focus-visible:ring-[#FF1F3D] h-12"
               />
             </div>
 
-            <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={loading}>
-              {loading ? "Carregando..." : (
+            <Button type="submit" className="w-full bg-[#FF1F3D] hover:bg-[#D91B34] text-white font-black h-12 text-base shadow-[0_10px_20px_rgba(255,31,61,0.2)]" disabled={loading}>
+              {loading ? "PROCESSANDO..." : (
                 <>
-                  <LogIn className="mr-2 h-4 w-4" /> Entrar
+                  <LogIn className="mr-2 h-5 w-5" /> ENTRAR NO SISTEMA
                 </>
               )}
             </Button>
@@ -109,26 +109,26 @@ function LoginPage() {
 
           <div className="relative my-8">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-border"></span>
+              <span className="w-full border-t border-[#1F1F1F]"></span>
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-secondary px-2 text-muted-foreground">Ou continue com</span>
+            <div className="relative flex justify-center text-[10px] font-bold uppercase tracking-widest">
+              <span className="bg-[#111111] px-4 text-[#475569]">Ou continue com</span>
             </div>
           </div>
 
           <Button 
             variant="outline" 
             type="button" 
-            className="w-full border-border text-white hover:bg-white/5"
+            className="w-full border-[#1F1F1F] bg-[#0A0A0A] text-white hover:bg-white/5 h-12 font-bold"
             onClick={handleGoogleLogin}
           >
             <img src="https://www.google.com/favicon.ico" alt="Google" className="mr-2 h-4 w-4" />
-            Google
+            GOOGLE ACCOUNT
           </Button>
 
-          <p className="mt-8 text-center text-sm text-muted-foreground">
+          <p className="mt-8 text-center text-sm text-[#94a3b8]">
             Não tem uma conta?{" "}
-            <Link to="/signup" className="text-primary hover:underline">
+            <Link to="/signup" className="text-[#FF1F3D] hover:underline font-bold">
               Crie agora
             </Link>
           </p>
