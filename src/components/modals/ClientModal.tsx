@@ -58,7 +58,7 @@ export function ClientModal({ isOpen, onClose, editingClient }: ClientModalProps
         if (error) throw error;
         toast.success("Cliente atualizado com sucesso!");
       } else {
-        const { error } = await supabase.from("clients").insert([values]);
+        const { error } = await supabase.from("clients").insert([{ ...values, is_active: true }]);
         if (error) throw error;
         toast.success("Cliente cadastrado com sucesso!");
       }
