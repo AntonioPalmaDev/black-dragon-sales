@@ -243,6 +243,7 @@ export function SaleModal({ isOpen, onClose, editingSale }: SaleModalProps) {
                         <SelectItem value="transferencia">Transf.</SelectItem>
                       </SelectContent>
                     </Select>
+                    <FormMessage />
                   </FormItem>
                 )} />
                 <FormField control={form.control} name="status" render={({ field }) => (
