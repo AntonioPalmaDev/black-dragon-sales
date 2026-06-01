@@ -110,7 +110,7 @@ export function SaleModal({ isOpen, onClose, editingSale }: SaleModalProps) {
   const watchedDiscount = form.watch("discount");
 
   const subtotal = watchedItems?.reduce((acc, item) => acc + (Number(item?.quantity || 0) * Number(item?.unit_price || 0)), 0) || 0;
-  const total = Math.max(0, subtotal - Number(watchedDiscount));
+  const total = Math.max(0, subtotal - Number(watchedDiscount || 0));
 
   const handleProductChange = (index: number, productId: string) => {
     const product = products?.find(p => p.id === productId);
@@ -121,25 +121,30 @@ export function SaleModal({ isOpen, onClose, editingSale }: SaleModalProps) {
 
   const onSubmit = async (values: SaleFormValues) => {
     setIsSubmitting(true);
+    console.log("Submitting sale with values:", values);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      // Allow creation even without user for testing purposes, but use ID if available
+      // Use user ID if available, otherwise it will be null (which is allowed by DB schema)
       const sellerId = user?.id;
 
       let saleId = editingSale?.id;
 
+      const saleData = {
+        client_id: values.client_id,
+        seller_id: sellerId,
+        payment_method: values.payment_method as any,
+        status: values.status as any,
+        subtotal,
+        discount: values.discount,
+        total_amount: total,
+        updated_at: new Date().toISOString(),
+      };
+
       if (editingSale) {
+        console.log("Updating existing sale:", editingSale.id);
         const { error: saleError } = await supabase
           .from("sales")
-          .update({
-            client_id: values.client_id,
-            payment_method: values.payment_method as any,
-            status: values.status as any,
-            subtotal,
-            discount: values.discount,
-            total_amount: total,
-            updated_at: new Date().toISOString(),
-          })
+          .update(saleData)
           .eq("id", editingSale.id);
 
         if (saleError) throw saleError;
@@ -152,43 +157,41 @@ export function SaleModal({ isOpen, onClose, editingSale }: SaleModalProps) {
         
         if (deleteError) throw deleteError;
       } else {
+        console.log("Inserting new sale");
         const { data: sale, error: saleError } = await supabase
           .from("sales")
-          .insert([{
-            client_id: values.client_id,
-            seller_id: sellerId,
-            payment_method: values.payment_method as any,
-            status: values.status as any,
-            subtotal,
-            discount: values.discount,
-            total_amount: total,
-          }])
+          .insert([saleData])
           .select()
           .single();
 
         if (saleError) throw saleError;
+        if (!sale) throw new Error("Falha ao criar registro de venda");
         saleId = sale.id;
       }
 
+      console.log("Inserting sale items for saleId:", saleId);
       const saleItems = values.items.map(item => ({
         sale_id: saleId,
         product_id: item.product_id,
         quantity: item.quantity,
         unit_price: item.unit_price,
-        total_item: item.quantity * item.unit_price,
+        total_item: Number(item.quantity) * Number(item.unit_price),
       }));
 
       const { error: itemsError } = await supabase.from("sale_items").insert(saleItems);
       if (itemsError) throw itemsError;
 
-      toast.success(editingSale ? "Operação atualizada!" : "Operação registrada!");
-      queryClient.invalidateQueries({ queryKey: ["sales"] });
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success(editingSale ? "Operação atualizada com sucesso!" : "Operação registrada com sucesso!");
+      
+      // Invalidate queries to refresh lists
+      await queryClient.invalidateQueries({ queryKey: ["sales"] });
+      await queryClient.invalidateQueries({ queryKey: ["products"] });
+      
       onClose();
       form.reset();
     } catch (error: any) {
+      console.error("Sale submission error:", error);
       toast.error(`Erro ao processar operação: ${error.message || "Erro desconhecido"}`);
-      console.error(error);
     } finally {
       setIsSubmitting(false);
     }
