@@ -310,7 +310,7 @@ export function SaleModal({ isOpen, onClose, editingSale }: SaleModalProps) {
                             </FormControl>
                             <SelectContent className="bg-[#111111] border-[#1F1F1F] text-white">
                               {products?.map((p) => (
-                                <SelectItem key={p.id} value={p.id}>{p.name} (R$ {Number(p.sale_price).toFixed(2)})</SelectItem>
+                                <SelectItem key={p.id} value={p.id}>{p.name} ({new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(p.sale_price))})</SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
