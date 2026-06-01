@@ -439,7 +439,7 @@ function DashboardPage() {
               <CardTitle className="text-sm font-bold uppercase tracking-widest text-[#FF1F3D]">Metas Globais</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
-              <StatRow label="Faturamento Acumulado" value={formatCurrency(totalFaturamento)} />
+              <StatRow label="Receita Total Acumulada" value={formatCurrency(totalFaturamento)} />
               <StatRow label="Ticket Médio" value={formatCurrency(ticketMedio)} />
               <StatRow label="Produtividade" value="+12.5%" isGreen />
               
@@ -490,7 +490,8 @@ function DashboardPage() {
       {/* KPI Grid - Now below the main chart */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4">
         <KPICard 
-          title="Lucro Líquido" 
+          title="Lucro Final" 
+
           value={formatCurrency(totalLucroLiquido)} 
 
           change="+8.4%" 
@@ -498,14 +499,14 @@ function DashboardPage() {
           icon={Wallet} 
         />
         <KPICard 
-          title="Faturamento" 
+          title="Receita Total" 
           value={formatCurrency(totalFaturamento)} 
           change="+12.1%" 
           trend="up" 
           icon={TrendingUp} 
         />
         <KPICard 
-          title="Lucro Líquido" 
+          title="Lucro Final" 
           value={formatCurrency(totalLucroLiquido)} 
           change="+5.2%" 
           trend="up" 
@@ -565,7 +566,7 @@ function DashboardPage() {
         <IndicatorPanel 
           title="Status Metas" 
           data={[
-            { name: "Faturamento", value: Math.min(100, Math.round((totalFaturamento / 250000) * 100)), color: "#FF1F3D" },
+            { name: "Receita Total", value: Math.min(100, Math.round((totalFaturamento / 250000) * 100)), color: "#FF1F3D" },
             { name: "Novos Clientes", value: Math.min(100, Math.round((clientesAtivos / 50) * 100)), color: "#475569" },
             { name: "Ticket Médio", value: Math.min(100, Math.round((ticketMedio / 500) * 100)), color: "#FF1F3D" },
             { name: "Vendas", value: Math.min(100, Math.round((totalVendas / 100) * 100)), color: "#475569" },
