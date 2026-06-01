@@ -261,6 +261,7 @@ export function SaleModal({ isOpen, onClose, editingSale }: SaleModalProps) {
                         <SelectItem value="cancelado" className="text-red-500">Cancelado</SelectItem>
                       </SelectContent>
                     </Select>
+                    <FormMessage />
                   </FormItem>
                 )} />
               </div>
