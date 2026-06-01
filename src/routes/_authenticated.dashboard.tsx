@@ -447,9 +447,9 @@ function DashboardPage() {
                   <div className="flex justify-between items-end">
                     <div className="flex flex-col">
                       <span className="text-[10px] text-[#475569] uppercase font-bold">Progresso</span>
-                      <span className="text-sm font-black text-white">{formatCurrency(totalReceitaLiquida)}</span>
+                      <span className="text-sm font-black text-white">{formatCurrency(totalLucroLiquido)}</span>
                     </div>
-                    <span className="text-[#FF1F3D] font-black text-xl">{Math.round((totalReceitaLiquida / 200000) * 100)}%</span>
+                    <span className="text-[#FF1F3D] font-black text-xl">{Math.round((totalLucroLiquido / 200000) * 100)}%</span>
                   </div>
                   <div className="h-2 w-full bg-[#0A0A0A] rounded-full overflow-hidden border border-[#1F1F1F]">
                     <div 
