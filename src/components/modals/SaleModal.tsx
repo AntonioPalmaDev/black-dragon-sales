@@ -125,24 +125,52 @@ export function SaleModal({ isOpen, onClose, editingSale }: SaleModalProps) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Usuário não autenticado");
 
-      const { data: sale, error: saleError } = await supabase
-        .from("sales")
-        .insert([{
-          client_id: values.client_id,
-          seller_id: user.id,
-          payment_method: values.payment_method as any,
-          status: values.status as any,
-          subtotal,
-          discount: values.discount,
-          total_amount: total,
-        }])
-        .select()
-        .single();
+      let saleId = editingSale?.id;
 
-      if (saleError) throw saleError;
+      if (editingSale) {
+        const { error: saleError } = await supabase
+          .from("sales")
+          .update({
+            client_id: values.client_id,
+            payment_method: values.payment_method as any,
+            status: values.status as any,
+            subtotal,
+            discount: values.discount,
+            total_amount: total,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", editingSale.id);
+
+        if (saleError) throw saleError;
+
+        // Delete existing items to re-insert
+        const { error: deleteError } = await supabase
+          .from("sale_items")
+          .delete()
+          .eq("sale_id", editingSale.id);
+        
+        if (deleteError) throw deleteError;
+      } else {
+        const { data: sale, error: saleError } = await supabase
+          .from("sales")
+          .insert([{
+            client_id: values.client_id,
+            seller_id: user.id,
+            payment_method: values.payment_method as any,
+            status: values.status as any,
+            subtotal,
+            discount: values.discount,
+            total_amount: total,
+          }])
+          .select()
+          .single();
+
+        if (saleError) throw saleError;
+        saleId = sale.id;
+      }
 
       const saleItems = values.items.map(item => ({
-        sale_id: sale.id,
+        sale_id: saleId,
         product_id: item.product_id,
         quantity: item.quantity,
         unit_price: item.unit_price,
@@ -152,13 +180,13 @@ export function SaleModal({ isOpen, onClose, editingSale }: SaleModalProps) {
       const { error: itemsError } = await supabase.from("sale_items").insert(saleItems);
       if (itemsError) throw itemsError;
 
-      toast.success("Venda registrada com sucesso!");
+      toast.success(editingSale ? "Operação atualizada!" : "Operação registrada!");
       queryClient.invalidateQueries({ queryKey: ["sales"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
       onClose();
       form.reset();
     } catch (error) {
-      toast.error("Erro ao registrar venda.");
+      toast.error("Erro ao processar operação.");
       console.error(error);
     } finally {
       setIsSubmitting(false);
