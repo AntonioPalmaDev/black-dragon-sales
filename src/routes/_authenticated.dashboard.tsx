@@ -330,11 +330,11 @@ function DashboardPage() {
               <div className="flex items-center gap-6 bg-[#0A0A0A] p-2 px-4 rounded-lg border border-[#1F1F1F]">
                 <div className="flex items-center gap-2">
                   <div className="h-2 w-2 rounded-full bg-[#FF1F3D] shadow-[0_0_5px_#FF1F3D]" />
-                  <span className="text-[10px] text-[#94a3b8] font-bold uppercase tracking-wider">Receita</span>
+                  <span className="text-[10px] text-[#94a3b8] font-bold uppercase tracking-wider">Receita Total</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="h-2 w-2 rounded-full bg-[#475569]" />
-                  <span className="text-[10px] text-[#94a3b8] font-bold uppercase tracking-wider">Lucro Líquido</span>
+                  <span className="text-[10px] text-[#94a3b8] font-bold uppercase tracking-wider">Lucro Final</span>
                 </div>
               </div>
             </div>
@@ -379,6 +379,7 @@ function DashboardPage() {
                   <Area 
                     type="monotone" 
                     dataKey="revenue" 
+                    name="Receita Total"
                     stroke="#FF1F3D" 
                     strokeWidth={4}
                     fillOpacity={1} 
@@ -388,6 +389,7 @@ function DashboardPage() {
                   <Area 
                     type="monotone" 
                     dataKey="netProfit" 
+                    name="Lucro Final"
                     stroke="#475569" 
                     strokeWidth={2}
                     strokeDasharray="5 5"
@@ -423,8 +425,8 @@ function DashboardPage() {
                     itemStyle={{ fontSize: "12px", fontWeight: "bold" }}
                     cursor={{ fill: 'rgba(255,31,61,0.1)' }}
                   />
-                  <Bar dataKey="revenue" fill="#FF1F3D" radius={[4, 4, 0, 0]} barSize={20} />
-                  <Bar dataKey="netProfit" fill="#475569" radius={[4, 4, 0, 0]} barSize={20} />
+                  <Bar dataKey="revenue" name="Receita Total" fill="#FF1F3D" radius={[4, 4, 0, 0]} barSize={20} />
+                  <Bar dataKey="netProfit" name="Lucro Final" fill="#475569" radius={[4, 4, 0, 0]} barSize={20} />
                 </BarChart>
               )}
             </ResponsiveContainer>
@@ -437,7 +439,7 @@ function DashboardPage() {
               <CardTitle className="text-sm font-bold uppercase tracking-widest text-[#FF1F3D]">Metas Globais</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
-              <StatRow label="Faturamento Acumulado" value={formatCurrency(totalFaturamento)} />
+              <StatRow label="Receita Total Acumulada" value={formatCurrency(totalFaturamento)} />
               <StatRow label="Ticket Médio" value={formatCurrency(ticketMedio)} />
               <StatRow label="Produtividade" value="+12.5%" isGreen />
               
@@ -488,7 +490,8 @@ function DashboardPage() {
       {/* KPI Grid - Now below the main chart */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4">
         <KPICard 
-          title="Lucro Líquido" 
+          title="Lucro Final" 
+
           value={formatCurrency(totalLucroLiquido)} 
 
           change="+8.4%" 
@@ -496,14 +499,14 @@ function DashboardPage() {
           icon={Wallet} 
         />
         <KPICard 
-          title="Faturamento" 
+          title="Receita Total" 
           value={formatCurrency(totalFaturamento)} 
           change="+12.1%" 
           trend="up" 
           icon={TrendingUp} 
         />
         <KPICard 
-          title="Lucro Líquido" 
+          title="Lucro Final" 
           value={formatCurrency(totalLucroLiquido)} 
           change="+5.2%" 
           trend="up" 
@@ -563,7 +566,7 @@ function DashboardPage() {
         <IndicatorPanel 
           title="Status Metas" 
           data={[
-            { name: "Faturamento", value: Math.min(100, Math.round((totalFaturamento / 250000) * 100)), color: "#FF1F3D" },
+            { name: "Receita Total", value: Math.min(100, Math.round((totalFaturamento / 250000) * 100)), color: "#FF1F3D" },
             { name: "Novos Clientes", value: Math.min(100, Math.round((clientesAtivos / 50) * 100)), color: "#475569" },
             { name: "Ticket Médio", value: Math.min(100, Math.round((ticketMedio / 500) * 100)), color: "#FF1F3D" },
             { name: "Vendas", value: Math.min(100, Math.round((totalVendas / 100) * 100)), color: "#475569" },
