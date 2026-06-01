@@ -35,6 +35,7 @@ export const Route = createFileRoute("/_authenticated/clients")({
 
 function ClientsPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { data: clients, isLoading } = useQuery({
     queryKey: ["clients"],
