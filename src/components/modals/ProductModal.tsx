@@ -55,11 +55,15 @@ export function ProductModal({ isOpen, onClose, editingProduct }: ProductModalPr
 
   const onSubmit = async (values: ProductFormValues) => {
     setIsSubmitting(true);
+    console.log("Submitting product:", values);
     try {
       if (editingProduct?.id) {
         const { error } = await supabase
           .from("products")
-          .update(values)
+          .update({
+            ...values,
+            updated_at: new Date().toISOString()
+          })
           .eq("id", editingProduct.id);
         if (error) throw error;
         toast.success("Produto atualizado com sucesso!");
@@ -69,17 +73,18 @@ export function ProductModal({ isOpen, onClose, editingProduct }: ProductModalPr
           unit_measure: "UN",
           stock_current: 0,
           stock_min: 0,
+          updated_at: new Date().toISOString()
         }]);
         if (error) throw error;
         toast.success("Produto cadastrado com sucesso!");
       }
       
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+      await queryClient.invalidateQueries({ queryKey: ["products"] });
       onClose();
       form.reset();
     } catch (error: any) {
+      console.error("Product submission error:", error);
       toast.error(editingProduct ? `Erro ao atualizar produto: ${error.message || "Erro desconhecido"}` : `Erro ao cadastrar produto: ${error.message || "Erro desconhecido"}`);
-      console.error(error);
     } finally {
       setIsSubmitting(false);
     }

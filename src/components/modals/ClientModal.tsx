@@ -49,25 +49,33 @@ export function ClientModal({ isOpen, onClose, editingClient }: ClientModalProps
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
+    console.log("Submitting client:", values);
     try {
       if (editingClient?.id) {
         const { error } = await supabase
           .from("clients")
-          .update(values)
+          .update({
+            ...values,
+            updated_at: new Date().toISOString()
+          })
           .eq("id", editingClient.id);
         if (error) throw error;
         toast.success("Cliente atualizado com sucesso!");
       } else {
-        const { error } = await supabase.from("clients").insert([{ ...values, is_active: true }]);
+        const { error } = await supabase.from("clients").insert([{ 
+          ...values, 
+          is_active: true,
+          updated_at: new Date().toISOString()
+        }]);
         if (error) throw error;
         toast.success("Cliente cadastrado com sucesso!");
       }
-      queryClient.invalidateQueries({ queryKey: ["clients"] });
+      await queryClient.invalidateQueries({ queryKey: ["clients"] });
       onClose();
       form.reset();
     } catch (error: any) {
+      console.error("Client submission error:", error);
       toast.error(editingClient ? `Erro ao atualizar cliente: ${error.message || "Erro desconhecido"}` : `Erro ao cadastrar cliente: ${error.message || "Erro desconhecido"}`);
-      console.error(error);
     } finally {
       setIsSubmitting(false);
     }
