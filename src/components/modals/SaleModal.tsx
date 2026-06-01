@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -10,13 +10,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
-import { Plus, Trash2, Package } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 
 const formSchema = z.object({
   client_id: z.string().min(1, "Cliente é obrigatório"),
-  payment_method: z.enum(['dinheiro', 'pix', 'debito', 'credito', 'boleto', 'transferencia']),
-  status: z.enum(['pendente', 'concluido', 'cancelado']),
-  discount: z.coerce.number().min(0).default(0),
+  payment_method: z.string(),
+  status: z.string(),
+  discount: z.coerce.number().min(0),
   items: z.array(z.object({
     product_id: z.string().min(1, "Produto é obrigatório"),
     quantity: z.coerce.number().min(1, "Mínimo 1"),
@@ -72,8 +72,8 @@ export function SaleModal({ isOpen, onClose }: SaleModalProps) {
   const watchedItems = form.watch("items");
   const watchedDiscount = form.watch("discount");
 
-  const subtotal = watchedItems.reduce((acc, item) => acc + (item.quantity * item.unit_price), 0);
-  const total = Math.max(0, subtotal - watchedDiscount);
+  const subtotal = watchedItems.reduce((acc, item) => acc + (Number(item.quantity) * Number(item.unit_price)), 0);
+  const total = Math.max(0, subtotal - Number(watchedDiscount));
 
   const handleProductChange = (index: number, productId: string) => {
     const product = products?.find(p => p.id === productId);
@@ -88,14 +88,13 @@ export function SaleModal({ isOpen, onClose }: SaleModalProps) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Usuário não autenticado");
 
-      // 1. Create Sale
       const { data: sale, error: saleError } = await supabase
         .from("sales")
         .insert([{
           client_id: values.client_id,
           seller_id: user.id,
-          payment_method: values.payment_method,
-          status: values.status,
+          payment_method: values.payment_method as any,
+          status: values.status as any,
           subtotal,
           discount: values.discount,
           total_amount: total,
@@ -105,7 +104,6 @@ export function SaleModal({ isOpen, onClose }: SaleModalProps) {
 
       if (saleError) throw saleError;
 
-      // 2. Create Sale Items
       const saleItems = values.items.map(item => ({
         sale_id: sale.id,
         product_id: item.product_id,
