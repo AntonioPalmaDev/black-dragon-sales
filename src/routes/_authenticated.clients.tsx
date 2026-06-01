@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { 
   Plus, 
@@ -28,6 +28,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/clients")({
   component: ClientsPage,
@@ -36,6 +37,8 @@ export const Route = createFileRoute("/_authenticated/clients")({
 function ClientsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingClient, setEditingClient] = useState<any>(null);
+  const queryClient = useQueryClient();
 
   const { data: clients, isLoading } = useQuery({
     queryKey: ["clients"],
@@ -48,6 +51,30 @@ function ClientsPage() {
       return data;
     },
   });
+
+  const handleEdit = (client: any) => {
+    setEditingClient(client);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Tem certeza que deseja excluir este cliente?")) return;
+    
+    try {
+      const { error } = await supabase.from("clients").delete().eq("id", id);
+      if (error) throw error;
+      toast.success("Cliente excluído com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["clients"] });
+    } catch (error) {
+      toast.error("Erro ao excluir cliente.");
+      console.error(error);
+    }
+  };
+
+  const handleOpenNewModal = () => {
+    setEditingClient(null);
+    setIsModalOpen(true);
+  };
 
   const filteredClients = clients?.filter((client) =>
     client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -65,7 +92,7 @@ function ClientsPage() {
           <p className="text-[#94a3b8] font-medium mt-1">Gerencie sua base de clientes e parceiros estratégicos.</p>
         </div>
         <Button 
-          onClick={() => setIsModalOpen(true)}
+          onClick={handleOpenNewModal}
           className="bg-[#FF1F3D] hover:bg-[#D91B34] text-white font-bold px-6"
         >
           <Plus className="mr-2 h-4 w-4" /> NOVO CLIENTE
@@ -130,10 +157,10 @@ function ClientsPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="bg-secondary border-border text-white">
-                        <DropdownMenuItem className="cursor-pointer hover:bg-white/5">
+                        <DropdownMenuItem className="cursor-pointer hover:bg-white/5" onClick={() => handleEdit(client)}>
                           <Edit className="mr-2 h-4 w-4" /> Editar
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer text-destructive hover:bg-destructive/10">
+                        <DropdownMenuItem className="cursor-pointer text-destructive hover:bg-destructive/10" onClick={() => handleDelete(client.id)}>
                           <Trash2 className="mr-2 h-4 w-4" /> Excluir
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -145,7 +172,7 @@ function ClientsPage() {
           </TableBody>
         </Table>
       </div>
-      <ClientModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <ClientModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} editingClient={editingClient} />
     </div>
   );
 }
