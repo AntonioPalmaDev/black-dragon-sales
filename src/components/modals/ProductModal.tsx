@@ -1,24 +1,18 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
 const formSchema = z.object({
   name: z.string().min(2, "Nome é obrigatório"),
-  sku: z.string().optional().or(z.literal("")),
-  category_id: z.string().optional().or(z.literal("")),
-  cost_price: z.coerce.number().min(0),
-  sale_price: z.coerce.number().min(0),
-  stock_current: z.coerce.number().int().min(0),
-  stock_min: z.coerce.number().int().min(0),
-  unit_measure: z.string().min(1, "Unidade é obrigatória"),
+  sale_price: z.coerce.number().min(0, "O valor deve ser maior ou igual a zero"),
+  is_active: z.boolean(),
 });
 
 type ProductFormValues = z.infer<typeof formSchema>;
@@ -31,40 +25,26 @@ interface ProductModalProps {
 export function ProductModal({ isOpen, onClose }: ProductModalProps) {
   const queryClient = useQueryClient();
   
-  const { data: categories } = useQuery({
-    queryKey: ["categories"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("categories").select("*").order("name");
-      if (error) throw error;
-      return data;
-    },
-  });
-
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      sku: "",
-      category_id: "",
-      cost_price: 0,
       sale_price: 0,
-      stock_current: 0,
-      stock_min: 0,
-      unit_measure: "UN",
+      is_active: true,
     },
   });
 
   const onSubmit = async (values: ProductFormValues) => {
     try {
-      // Clean up empty strings for optional fields
-      const dataToInsert = {
+      const { error } = await supabase.from("products").insert([{
         ...values,
-        sku: values.sku || null,
-        category_id: values.category_id || null,
-      };
-
-      const { error } = await supabase.from("products").insert([dataToInsert]);
+        unit_measure: "UN", // Defaulting as it might be required in DB or UI logic elsewhere
+        stock_current: 0,
+        stock_min: 0,
+      }]);
+      
       if (error) throw error;
+      
       toast.success("Produto cadastrado com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["products"] });
       onClose();
@@ -77,77 +57,86 @@ export function ProductModal({ isOpen, onClose }: ProductModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-[#0A0A0A] border-[#1F1F1F] text-white sm:max-w-[500px] p-0 overflow-hidden rounded-2xl">
+      <DialogContent className="bg-[#0A0A0A] border-[#1F1F1F] text-white sm:max-w-[400px] p-0 overflow-hidden rounded-2xl">
         <div className="bg-[#111111] p-6 border-b border-[#1F1F1F]">
           <DialogHeader>
-            <DialogTitle className="text-white text-lg font-bold tracking-tight">ADICIONAR NOVO PRODUTO</DialogTitle>
+            <DialogTitle className="text-white text-lg font-bold tracking-tight text-center uppercase">Adicionar Novo Produto</DialogTitle>
           </DialogHeader>
         </div>
+        
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <FormField control={form.control} name="name" render={({ field }) => (
-                <FormItem className="col-span-2">
-                  <FormLabel>Nome do Produto</FormLabel>
-                  <FormControl><Input {...field} className="bg-[#0A0A0A] border-[#1F1F1F]" /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-              <FormField control={form.control} name="sku" render={({ field }) => (
-                <FormItem>
-                  <FormLabel>SKU</FormLabel>
-                  <FormControl><Input {...field} className="bg-[#0A0A0A] border-[#1F1F1F]" /></FormControl>
-                </FormItem>
-              )} />
-              <FormField control={form.control} name="category_id" render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Categoria</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="bg-[#0A0A0A] border-[#1F1F1F]">
-                        <SelectValue placeholder="Selecione..." />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="bg-[#111111] border-[#1F1F1F] text-white">
-                      {categories?.map((cat) => (
-                        <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              )} />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <FormField control={form.control} name="cost_price" render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Preço de Custo</FormLabel>
-                  <FormControl><Input type="number" step="0.01" {...field} className="bg-[#0A0A0A] border-[#1F1F1F]" /></FormControl>
-                </FormItem>
-              )} />
-              <FormField control={form.control} name="sale_price" render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Preço de Venda</FormLabel>
-                  <FormControl><Input type="number" step="0.01" {...field} className="bg-[#0A0A0A] border-[#1F1F1F]" /></FormControl>
-                </FormItem>
-              )} />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <FormField control={form.control} name="stock_current" render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Estoque Atual</FormLabel>
-                  <FormControl><Input type="number" {...field} className="bg-[#0A0A0A] border-[#1F1F1F]" /></FormControl>
-                </FormItem>
-              )} />
-              <FormField control={form.control} name="stock_min" render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Estoque Mínimo</FormLabel>
-                  <FormControl><Input type="number" {...field} className="bg-[#0A0A0A] border-[#1F1F1F]" /></FormControl>
-                </FormItem>
-              )} />
-            </div>
-            <div className="pt-4">
-              <Button type="submit" className="w-full h-12 bg-[#FF1F3D] hover:bg-[#D91B34] text-white font-black uppercase tracking-widest rounded-xl shadow-xl shadow-[#FF1F3D]/10 transition-all hover:scale-[1.02] active:scale-[0.98]">
-                SALVAR PRODUTO
+          <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 space-y-6">
+            <FormField control={form.control} name="is_active" render={({ field }) => (
+              <FormItem className="space-y-3">
+                <FormLabel className="text-xs uppercase tracking-widest text-zinc-500 font-bold">Status do Produto</FormLabel>
+                <FormControl>
+                  <div className="flex p-1 bg-[#1A1A1A] rounded-lg border border-[#1F1F1F]">
+                    <button
+                      type="button"
+                      onClick={() => field.onChange(true)}
+                      className={`flex-1 py-2 text-sm font-bold rounded-md transition-all ${
+                        field.value === true 
+                        ? "bg-[#FF1F3D] text-white shadow-lg" 
+                        : "text-zinc-500 hover:text-white"
+                      }`}
+                    >
+                      ATIVO
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => field.onChange(false)}
+                      className={`flex-1 py-2 text-sm font-bold rounded-md transition-all ${
+                        field.value === false 
+                        ? "bg-[#FF1F3D] text-white shadow-lg" 
+                        : "text-zinc-500 hover:text-white"
+                      }`}
+                    >
+                      INATIVO
+                    </button>
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+
+            <FormField control={form.control} name="name" render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-xs uppercase tracking-widest text-zinc-500 font-bold">Nome do Produto</FormLabel>
+                <FormControl>
+                  <Input 
+                    {...field} 
+                    placeholder="Ex: Camiseta Black Dragons"
+                    className="bg-[#111111] border-[#1F1F1F] h-12 focus:border-[#FF1F3D] focus:ring-[#FF1F3D] transition-all rounded-xl" 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+
+            <FormField control={form.control} name="sale_price" render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-xs uppercase tracking-widest text-zinc-500 font-bold">Valor Unitário</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 font-bold">R$</span>
+                    <Input 
+                      type="number"
+                      step="0.01"
+                      {...field} 
+                      className="bg-[#111111] border-[#1F1F1F] h-12 pl-12 focus:border-[#FF1F3D] focus:ring-[#FF1F3D] transition-all rounded-xl" 
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+
+            <div className="pt-2">
+              <Button 
+                type="submit" 
+                className="w-full h-12 bg-[#FF1F3D] hover:bg-[#D91B34] text-white font-black uppercase tracking-widest rounded-xl shadow-xl shadow-[#FF1F3D]/10 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              >
+                CADASTRAR PRODUTO
               </Button>
             </div>
           </form>
