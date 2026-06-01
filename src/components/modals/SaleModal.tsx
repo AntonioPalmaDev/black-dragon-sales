@@ -372,7 +372,9 @@ export function SaleModal({ isOpen, onClose, editingSale }: SaleModalProps) {
             <div className="bg-[#111111] p-6 rounded-2xl border border-[#1F1F1F] space-y-4 shadow-xl">
               <div className="flex justify-between items-center text-xs tracking-widest font-bold">
                 <span className="text-zinc-500 uppercase">SUBTOTAL</span>
-                <span className="text-white font-mono text-sm">R$ {subtotal.toFixed(2)}</span>
+                <span className="text-white font-mono text-sm">
+                  {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(subtotal)}
+                </span>
               </div>
               <div className="flex justify-between items-center text-xs tracking-widest font-bold">
                 <span className="text-zinc-500 uppercase">DESCONTO</span>
@@ -395,7 +397,9 @@ export function SaleModal({ isOpen, onClose, editingSale }: SaleModalProps) {
               </div>
               <div className="pt-4 border-t border-[#1F1F1F] flex justify-between items-center">
                 <span className="text-white text-sm font-black uppercase tracking-[0.2em]">VALOR TOTAL</span>
-                <span className="text-3xl font-black text-[#FF1F3D] font-mono tracking-tighter">R$ {total.toFixed(2)}</span>
+                <span className="text-3xl font-black text-[#FF1F3D] font-mono tracking-tighter">
+                  {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(total)}
+                </span>
               </div>
             </div>
 
