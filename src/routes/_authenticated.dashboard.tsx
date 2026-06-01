@@ -509,19 +509,20 @@ function KPICard({ title, value, change, trend, icon: Icon, isHighlight }: KPICa
             )}>{value}</h3>
           </div>
         </div>
-        <div className="flex items-center gap-1.5 mt-4">
-          <div className={cn(
-            "flex items-center text-[10px] font-black px-1.5 py-0.5 rounded",
-            isHighlight ? "bg-black/20 text-white" : trend === 'up' ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"
-          )}>
-            {trend === 'up' ? <ArrowUpRight size={10} className="mr-0.5" /> : <ArrowDownRight size={10} className="mr-0.5" />}
-            {change}
+        {!isHighlight && (
+          <div className="flex items-center gap-1.5 mt-4">
+            <div className={cn(
+              "flex items-center text-[10px] font-black px-1.5 py-0.5 rounded",
+              trend === 'up' ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"
+            )}>
+              {trend === 'up' ? <ArrowUpRight size={10} className="mr-0.5" /> : <ArrowDownRight size={10} className="mr-0.5" />}
+              {change}
+            </div>
+            <span className={cn(
+              "text-[8px] font-bold uppercase tracking-tight text-[#475569]"
+            )}>vs. anterior</span>
           </div>
-          <span className={cn(
-            "text-[8px] font-bold uppercase tracking-tight",
-            isHighlight ? "text-white/60" : "text-[#475569]"
-          )}>vs. anterior</span>
-        </div>
+        )}
       </CardContent>
     </Card>
   );
