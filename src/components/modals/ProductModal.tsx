@@ -77,12 +77,14 @@ export function ProductModal({ isOpen, onClose }: ProductModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-[#111111] border-[#1F1F1F] text-white sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle className="text-white text-xl uppercase font-black">NOVO PRODUTO</DialogTitle>
-        </DialogHeader>
+      <DialogContent className="bg-[#0A0A0A] border-[#1F1F1F] text-white sm:max-w-[500px] p-0 overflow-hidden rounded-2xl">
+        <div className="bg-[#111111] p-6 border-b border-[#1F1F1F]">
+          <DialogHeader>
+            <DialogTitle className="text-white text-lg font-bold tracking-tight">ADICIONAR NOVO PRODUTO</DialogTitle>
+          </DialogHeader>
+        </div>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <FormField control={form.control} name="name" render={({ field }) => (
                 <FormItem className="col-span-2">
@@ -143,9 +145,11 @@ export function ProductModal({ isOpen, onClose }: ProductModalProps) {
                 </FormItem>
               )} />
             </div>
-            <DialogFooter>
-              <Button type="submit" className="bg-[#FF1F3D] hover:bg-[#D91B34] text-white font-bold w-full sm:w-auto">SALVAR PRODUTO</Button>
-            </DialogFooter>
+            <div className="pt-4">
+              <Button type="submit" className="w-full h-12 bg-[#FF1F3D] hover:bg-[#D91B34] text-white font-black uppercase tracking-widest rounded-xl shadow-xl shadow-[#FF1F3D]/10 transition-all hover:scale-[1.02] active:scale-[0.98]">
+                SALVAR PRODUTO
+              </Button>
+            </div>
           </form>
         </Form>
       </DialogContent>

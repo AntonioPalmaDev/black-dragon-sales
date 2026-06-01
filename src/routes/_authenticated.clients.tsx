@@ -89,9 +89,8 @@ function ClientsPage() {
           <TableHeader className="bg-white/[0.01]">
             <TableRow className="hover:bg-transparent border-[#1F1F1F]">
               <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[#475569] h-12">Nome</TableHead>
-              <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[#475569] h-12">Documento</TableHead>
-              <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[#475569] h-12">Email</TableHead>
-              <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[#475569] h-12">Telefone</TableHead>
+              <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[#475569] h-12">Tipo</TableHead>
+              <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[#475569] h-12">Status</TableHead>
               <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[#475569] h-12">Status</TableHead>
               <TableHead className="text-right text-[10px] font-bold uppercase tracking-widest text-[#475569] h-12">Ações</TableHead>
             </TableRow>
@@ -113,9 +112,11 @@ function ClientsPage() {
               filteredClients?.map((client) => (
                 <TableRow key={client.id} className="hover:bg-white/[0.02] transition-colors border-[#1F1F1F] group cursor-pointer">
                   <TableCell className="font-bold text-white group-hover:text-[#FF1F3D] transition-colors">{client.name}</TableCell>
-                  <TableCell className="text-[#475569] text-xs font-mono">{client.document || "-"}</TableCell>
-                  <TableCell className="text-[#94a3b8] text-xs">{client.email || "-"}</TableCell>
-                  <TableCell className="text-[#94a3b8] text-xs">{client.phone || "-"}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="text-[10px] font-bold bg-[#1A1A1A] border-[#1F1F1F] text-[#FF1F3D]">
+                      {client.type || "PF"}
+                    </Badge>
+                  </TableCell>
                   <TableCell>
                     <Badge variant={client.is_active ? "default" : "secondary"} className={cn("text-[10px] font-bold uppercase tracking-tighter", client.is_active ? "bg-green-500/10 text-green-500 border-green-500/20" : "bg-[#1A1A1A] text-[#475569] border-[#1F1F1F]")}>
                       {client.is_active ? "Ativo" : "Inativo"}

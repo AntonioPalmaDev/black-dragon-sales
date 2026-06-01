@@ -130,12 +130,14 @@ export function SaleModal({ isOpen, onClose }: SaleModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-[#111111] border-[#1F1F1F] text-white sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-white text-xl uppercase font-black">NOVA OPERAÇÃO DE VENDA</DialogTitle>
-        </DialogHeader>
+      <DialogContent className="bg-[#0A0A0A] border-[#1F1F1F] text-white sm:max-w-[800px] max-h-[90vh] p-0 overflow-hidden rounded-2xl flex flex-col">
+        <div className="bg-[#111111] p-6 border-b border-[#1F1F1F]">
+          <DialogHeader>
+            <DialogTitle className="text-white text-lg font-bold tracking-tight">NOVA OPERAÇÃO DE VENDA</DialogTitle>
+          </DialogHeader>
+        </div>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 space-y-6 overflow-y-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField control={form.control} name="client_id" render={({ field }) => (
                 <FormItem>
