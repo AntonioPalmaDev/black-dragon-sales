@@ -29,6 +29,7 @@ type SaleFormValues = z.infer<typeof formSchema>;
 interface SaleModalProps {
   isOpen: boolean;
   onClose: () => void;
+  editingSale?: any;
 }
 
 export function SaleModal({ isOpen, onClose }: SaleModalProps) {
