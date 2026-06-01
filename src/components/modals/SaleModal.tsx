@@ -48,7 +48,7 @@ export function SaleModal({ isOpen, onClose, editingSale }: SaleModalProps) {
   const { data: products } = useQuery({
     queryKey: ["products-active"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("products").select("id, name, sale_price, stock_current").eq("is_active", true).order("name");
+      const { data, error } = await supabase.from("products").select("id, name, sale_price, cost_price, stock_current").eq("is_active", true).order("name");
       if (error) throw error;
       return data;
     },
@@ -129,6 +129,15 @@ export function SaleModal({ isOpen, onClose, editingSale }: SaleModalProps) {
 
       let saleId = editingSale?.id;
 
+      // Calcular lucro líquido
+      const totalCost = values.items.reduce((acc, item) => {
+        const product = products?.find(p => p.id === item.product_id);
+        const cost = Number(product?.cost_price || 0);
+        return acc + (cost * Number(item.quantity));
+      }, 0);
+      
+      const net_profit = total - totalCost;
+
       const saleData = {
         client_id: values.client_id,
         seller_id: sellerId,
@@ -137,6 +146,7 @@ export function SaleModal({ isOpen, onClose, editingSale }: SaleModalProps) {
         subtotal,
         discount: values.discount,
         total_amount: total,
+        net_profit: net_profit,
         updated_at: new Date().toISOString(),
       };
 
