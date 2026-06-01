@@ -240,6 +240,21 @@ function DashboardPage() {
     }).format(value);
   };
 
+  const formatCompactNumber = (value: number) => {
+    if (value >= 1000000) {
+      const formatted = (value / 1000000).toFixed(1);
+      return `R$ ${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted}M`;
+    }
+    if (value >= 1000) {
+      const formatted = (value / 1000).toFixed(1);
+      return `R$ ${formatted.endsWith('.0') ? formatted.slice(0, -2) : formatted}k`;
+    }
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(value);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -363,7 +378,7 @@ function DashboardPage() {
                     fontSize={10} 
                     tickLine={false} 
                     axisLine={false}
-                    tickFormatter={(value) => `R$ ${value >= 1000 ? (value/1000).toFixed(1) + 'k' : value}`}
+                    tickFormatter={formatCompactNumber}
                   />
                   <Tooltip 
                     contentStyle={{ 
@@ -412,7 +427,7 @@ function DashboardPage() {
                     fontSize={10} 
                     tickLine={false} 
                     axisLine={false}
-                    tickFormatter={(value) => `R$ ${value >= 1000 ? (value/1000).toFixed(1) + 'k' : value}`}
+                    tickFormatter={formatCompactNumber}
                   />
                   <Tooltip 
                     contentStyle={{ 
