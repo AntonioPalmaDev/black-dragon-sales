@@ -317,58 +317,92 @@ function DashboardPage() {
           </CardHeader>
           <CardContent className="pt-8 h-[500px]">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={revenueData}>
-                <defs>
-                  <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#FF1F3D" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#FF1F3D" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1F1F1F" vertical={false} />
-                <XAxis 
-                  dataKey="name" 
-                  stroke="#475569" 
-                  fontSize={10} 
-                  tickLine={false} 
-                  axisLine={false}
-                  dy={10}
-                />
-                <YAxis 
-                  stroke="#475569" 
-                  fontSize={10} 
-                  tickLine={false} 
-                  axisLine={false}
-                  tickFormatter={(value) => `R$ ${value >= 1000 ? (value/1000).toFixed(1) + 'k' : value}`}
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: "#0A0A0A", 
-                    border: "1px solid #1F1F1F",
-                    borderRadius: "12px",
-                    boxShadow: "0 20px 40px rgba(0,0,0,0.6)",
-                    color: "white"
-                  }}
-                  itemStyle={{ fontSize: "12px", fontWeight: "bold" }}
-                  cursor={{ stroke: '#FF1F3D', strokeWidth: 1 }}
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="revenue" 
-                  stroke="#FF1F3D" 
-                  strokeWidth={4}
-                  fillOpacity={1} 
-                  fill="url(#colorRevenue)" 
-                  animationDuration={2000}
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="billing" 
-                  stroke="#475569" 
-                  strokeWidth={2}
-                  strokeDasharray="5 5"
-                  fill="transparent"
-                />
-              </AreaChart>
+              {chartType === "area" ? (
+                <AreaChart data={revenueData}>
+                  <defs>
+                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#FF1F3D" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#FF1F3D" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1F1F1F" vertical={false} />
+                  <XAxis 
+                    dataKey="name" 
+                    stroke="#475569" 
+                    fontSize={10} 
+                    tickLine={false} 
+                    axisLine={false}
+                    dy={10}
+                  />
+                  <YAxis 
+                    stroke="#475569" 
+                    fontSize={10} 
+                    tickLine={false} 
+                    axisLine={false}
+                    tickFormatter={(value) => `R$ ${value >= 1000 ? (value/1000).toFixed(1) + 'k' : value}`}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: "#0A0A0A", 
+                      border: "1px solid #1F1F1F",
+                      borderRadius: "12px",
+                      boxShadow: "0 20px 40px rgba(0,0,0,0.6)",
+                      color: "white"
+                    }}
+                    itemStyle={{ fontSize: "12px", fontWeight: "bold" }}
+                    cursor={{ stroke: '#FF1F3D', strokeWidth: 1 }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="revenue" 
+                    stroke="#FF1F3D" 
+                    strokeWidth={4}
+                    fillOpacity={1} 
+                    fill="url(#colorRevenue)" 
+                    animationDuration={2000}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="billing" 
+                    stroke="#475569" 
+                    strokeWidth={2}
+                    strokeDasharray="5 5"
+                    fill="transparent"
+                  />
+                </AreaChart>
+              ) : (
+                <BarChart data={revenueData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1F1F1F" vertical={false} />
+                  <XAxis 
+                    dataKey="name" 
+                    stroke="#475569" 
+                    fontSize={10} 
+                    tickLine={false} 
+                    axisLine={false}
+                    dy={10}
+                  />
+                  <YAxis 
+                    stroke="#475569" 
+                    fontSize={10} 
+                    tickLine={false} 
+                    axisLine={false}
+                    tickFormatter={(value) => `R$ ${value >= 1000 ? (value/1000).toFixed(1) + 'k' : value}`}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: "#0A0A0A", 
+                      border: "1px solid #1F1F1F",
+                      borderRadius: "12px",
+                      boxShadow: "0 20px 40px rgba(0,0,0,0.6)",
+                      color: "white"
+                    }}
+                    itemStyle={{ fontSize: "12px", fontWeight: "bold" }}
+                    cursor={{ fill: 'rgba(255,31,61,0.1)' }}
+                  />
+                  <Bar dataKey="revenue" fill="#FF1F3D" radius={[4, 4, 0, 0]} barSize={20} />
+                  <Bar dataKey="billing" fill="#475569" radius={[4, 4, 0, 0]} barSize={20} />
+                </BarChart>
+              )}
             </ResponsiveContainer>
           </CardContent>
         </Card>
