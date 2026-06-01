@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -18,10 +18,13 @@ const formSchema = z.object({
 interface ClientModalProps {
   isOpen: boolean;
   onClose: () => void;
+  editingClient?: any;
 }
 
-export function ClientModal({ isOpen, onClose }: ClientModalProps) {
+export function ClientModal({ isOpen, onClose, editingClient }: ClientModalProps) {
   const queryClient = useQueryClient();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -30,17 +33,43 @@ export function ClientModal({ isOpen, onClose }: ClientModalProps) {
     },
   });
 
+  useEffect(() => {
+    if (editingClient) {
+      form.reset({
+        name: editingClient.name || "",
+        type: (editingClient.type as "PF" | "PJ") || "PF",
+      });
+    } else {
+      form.reset({
+        name: "",
+        type: "PF",
+      });
+    }
+  }, [editingClient, form, isOpen]);
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsSubmitting(true);
     try {
-      const { error } = await supabase.from("clients").insert([values]);
-      if (error) throw error;
-      toast.success("Cliente cadastrado com sucesso!");
+      if (editingClient?.id) {
+        const { error } = await supabase
+          .from("clients")
+          .update(values)
+          .eq("id", editingClient.id);
+        if (error) throw error;
+        toast.success("Cliente atualizado com sucesso!");
+      } else {
+        const { error } = await supabase.from("clients").insert([values]);
+        if (error) throw error;
+        toast.success("Cliente cadastrado com sucesso!");
+      }
       queryClient.invalidateQueries({ queryKey: ["clients"] });
       onClose();
       form.reset();
     } catch (error) {
-      toast.error("Erro ao cadastrar cliente.");
+      toast.error(editingClient ? "Erro ao atualizar cliente." : "Erro ao cadastrar cliente.");
       console.error(error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -49,7 +78,9 @@ export function ClientModal({ isOpen, onClose }: ClientModalProps) {
       <DialogContent className="bg-[#0A0A0A] border-[#1F1F1F] text-white sm:max-w-[400px] p-0 overflow-hidden rounded-2xl">
         <div className="bg-[#111111] p-6 border-b border-[#1F1F1F]">
           <DialogHeader>
-            <DialogTitle className="text-white text-lg font-bold tracking-tight">ADICIONAR NOVO CLIENTE</DialogTitle>
+            <DialogTitle className="text-white text-lg font-bold tracking-tight uppercase">
+              {editingClient ? "EDITAR CLIENTE" : "ADICIONAR NOVO CLIENTE"}
+            </DialogTitle>
           </DialogHeader>
         </div>
         
@@ -105,9 +136,10 @@ export function ClientModal({ isOpen, onClose }: ClientModalProps) {
             <div className="pt-2">
               <Button 
                 type="submit" 
+                disabled={isSubmitting}
                 className="w-full h-12 bg-[#FF1F3D] hover:bg-[#D91B34] text-white font-black uppercase tracking-widest rounded-xl shadow-xl shadow-[#FF1F3D]/10 transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
-                CADASTRAR CLIENTE
+                {isSubmitting ? "PROCESSANDO..." : editingClient ? "SALVAR ALTERAÇÕES" : "CADASTRAR CLIENTE"}
               </Button>
             </div>
           </form>

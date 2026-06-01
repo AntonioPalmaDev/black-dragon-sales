@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { 
   Plus, 
@@ -9,7 +9,8 @@ import {
   Eye, 
   FileText, 
   XCircle,
-  Calendar
+  Calendar,
+  Trash2
 } from "lucide-react";
 import { SaleModal } from "@/components/modals/SaleModal";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/sales")({
   component: SalesPage,
@@ -39,6 +41,7 @@ export const Route = createFileRoute("/_authenticated/sales")({
 function SalesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   const { data: sales, isLoading } = useQuery({
     queryKey: ["sales"],
@@ -52,8 +55,40 @@ function SalesPage() {
     },
   });
 
+  const handleCancelSale = async (id: string) => {
+    if (!confirm("Tem certeza que deseja cancelar esta venda?")) return;
+    
+    try {
+      const { error } = await supabase
+        .from("sales")
+        .update({ status: "cancelado" })
+        .eq("id", id);
+      if (error) throw error;
+      toast.success("Venda cancelada com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["sales"] });
+    } catch (error) {
+      toast.error("Erro ao cancelar venda.");
+      console.error(error);
+    }
+  };
+
+  const handleDeleteSale = async (id: string) => {
+    if (!confirm("Tem certeza que deseja EXCLUIR permanentemente esta venda?")) return;
+    
+    try {
+      // sale_items should be deleted automatically if cascade is on, otherwise we need manual delete
+      const { error } = await supabase.from("sales").delete().eq("id", id);
+      if (error) throw error;
+      toast.success("Venda excluída com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["sales"] });
+    } catch (error) {
+      toast.error("Erro ao excluir venda.");
+      console.error(error);
+    }
+  };
+
   const filteredSales = sales?.filter((sale) =>
-    sale.clients?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    sale.clients?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     sale.sale_number?.toString().includes(searchTerm)
   );
 
@@ -158,8 +193,11 @@ function SalesPage() {
                         <DropdownMenuItem className="cursor-pointer hover:bg-white/5">
                           <FileText className="mr-2 h-4 w-4" /> Comprovante
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer text-destructive hover:bg-destructive/10">
+                        <DropdownMenuItem className="cursor-pointer text-yellow-500 hover:bg-yellow-500/10" onClick={() => handleCancelSale(sale.id)}>
                           <XCircle className="mr-2 h-4 w-4" /> Cancelar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="cursor-pointer text-destructive hover:bg-destructive/10" onClick={() => handleDeleteSale(sale.id)}>
+                          <Trash2 className="mr-2 h-4 w-4" /> Excluir
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

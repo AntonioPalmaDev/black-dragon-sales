@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { 
   Plus, 
@@ -10,7 +10,6 @@ import {
   Edit, 
   Trash2, 
   Package,
-  AlertTriangle
 } from "lucide-react";
 import { ProductModal } from "@/components/modals/ProductModal";
 import { Button } from "@/components/ui/button";
@@ -30,6 +29,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/products")({
   component: ProductsPage,
@@ -38,6 +38,8 @@ export const Route = createFileRoute("/_authenticated/products")({
 function ProductsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<any>(null);
+  const queryClient = useQueryClient();
 
   const { data: products, isLoading } = useQuery({
     queryKey: ["products"],
@@ -50,6 +52,30 @@ function ProductsPage() {
       return data;
     },
   });
+
+  const handleEdit = (product: any) => {
+    setEditingProduct(product);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Tem certeza que deseja excluir este produto?")) return;
+    
+    try {
+      const { error } = await supabase.from("products").delete().eq("id", id);
+      if (error) throw error;
+      toast.success("Produto excluído com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    } catch (error) {
+      toast.error("Erro ao excluir produto. Verifique se ele não possui vendas vinculadas.");
+      console.error(error);
+    }
+  };
+
+  const handleOpenNewModal = () => {
+    setEditingProduct(null);
+    setIsModalOpen(true);
+  };
 
   const filteredProducts = products?.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -73,7 +99,7 @@ function ProductsPage() {
           <p className="text-[#94a3b8] font-medium mt-1">Gerencie seu inventário e níveis de estoque.</p>
         </div>
         <Button 
-          onClick={() => setIsModalOpen(true)}
+          onClick={handleOpenNewModal}
           className="bg-[#FF1F3D] hover:bg-[#D91B34] text-white font-bold px-6"
         >
           <Plus className="mr-2 h-4 w-4" /> NOVO PRODUTO
@@ -148,10 +174,10 @@ function ProductsPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="bg-[#111111] border-[#1F1F1F] text-white">
-                          <DropdownMenuItem className="cursor-pointer hover:bg-white/5">
+                          <DropdownMenuItem className="cursor-pointer hover:bg-white/5" onClick={() => handleEdit(product)}>
                             <Edit className="mr-2 h-4 w-4" /> Editar
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="cursor-pointer text-destructive hover:bg-destructive/10">
+                          <DropdownMenuItem className="cursor-pointer text-destructive hover:bg-destructive/10" onClick={() => handleDelete(product.id)}>
                             <Trash2 className="mr-2 h-4 w-4" /> Excluir
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -164,7 +190,7 @@ function ProductsPage() {
           </TableBody>
         </Table>
       </div>
-      <ProductModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <ProductModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} editingProduct={editingProduct} />
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 
 const formSchema = z.object({
   name: z.string().min(2, "Nome é obrigatório"),
@@ -20,10 +21,12 @@ type ProductFormValues = z.infer<typeof formSchema>;
 interface ProductModalProps {
   isOpen: boolean;
   onClose: () => void;
+  editingProduct?: any;
 }
 
-export function ProductModal({ isOpen, onClose }: ProductModalProps) {
+export function ProductModal({ isOpen, onClose, editingProduct }: ProductModalProps) {
   const queryClient = useQueryClient();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(formSchema),
@@ -34,24 +37,51 @@ export function ProductModal({ isOpen, onClose }: ProductModalProps) {
     },
   });
 
+  useEffect(() => {
+    if (editingProduct) {
+      form.reset({
+        name: editingProduct.name || "",
+        sale_price: Number(editingProduct.sale_price) || 0,
+        is_active: editingProduct.is_active ?? true,
+      });
+    } else {
+      form.reset({
+        name: "",
+        sale_price: 0,
+        is_active: true,
+      });
+    }
+  }, [editingProduct, form, isOpen]);
+
   const onSubmit = async (values: ProductFormValues) => {
+    setIsSubmitting(true);
     try {
-      const { error } = await supabase.from("products").insert([{
-        ...values,
-        unit_measure: "UN", // Defaulting as it might be required in DB or UI logic elsewhere
-        stock_current: 0,
-        stock_min: 0,
-      }]);
+      if (editingProduct?.id) {
+        const { error } = await supabase
+          .from("products")
+          .update(values)
+          .eq("id", editingProduct.id);
+        if (error) throw error;
+        toast.success("Produto atualizado com sucesso!");
+      } else {
+        const { error } = await supabase.from("products").insert([{
+          ...values,
+          unit_measure: "UN",
+          stock_current: 0,
+          stock_min: 0,
+        }]);
+        if (error) throw error;
+        toast.success("Produto cadastrado com sucesso!");
+      }
       
-      if (error) throw error;
-      
-      toast.success("Produto cadastrado com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["products"] });
       onClose();
       form.reset();
     } catch (error) {
-      toast.error("Erro ao cadastrar produto.");
+      toast.error(editingProduct ? "Erro ao atualizar produto." : "Erro ao cadastrar produto.");
       console.error(error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -60,7 +90,9 @@ export function ProductModal({ isOpen, onClose }: ProductModalProps) {
       <DialogContent className="bg-[#0A0A0A] border-[#1F1F1F] text-white sm:max-w-[400px] p-0 overflow-hidden rounded-2xl">
         <div className="bg-[#111111] p-6 border-b border-[#1F1F1F]">
           <DialogHeader>
-            <DialogTitle className="text-white text-lg font-bold tracking-tight text-center uppercase">Adicionar Novo Produto</DialogTitle>
+            <DialogTitle className="text-white text-lg font-bold tracking-tight text-center uppercase">
+              {editingProduct ? "EDITAR PRODUTO" : "ADICIONAR NOVO PRODUTO"}
+            </DialogTitle>
           </DialogHeader>
         </div>
         
@@ -134,9 +166,10 @@ export function ProductModal({ isOpen, onClose }: ProductModalProps) {
             <div className="pt-2">
               <Button 
                 type="submit" 
+                disabled={isSubmitting}
                 className="w-full h-12 bg-[#FF1F3D] hover:bg-[#D91B34] text-white font-black uppercase tracking-widest rounded-xl shadow-xl shadow-[#FF1F3D]/10 transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
-                CADASTRAR PRODUTO
+                {isSubmitting ? "PROCESSANDO..." : editingProduct ? "SALVAR ALTERAÇÕES" : "CADASTRAR PRODUTO"}
               </Button>
             </div>
           </form>
