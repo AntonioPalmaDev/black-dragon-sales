@@ -41,6 +41,7 @@ export const Route = createFileRoute("/_authenticated/sales")({
 function SalesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingSale, setEditingSale] = useState<any>(null);
   const queryClient = useQueryClient();
 
   const { data: sales, isLoading } = useQuery({
@@ -122,7 +123,7 @@ function SalesPage() {
           <p className="text-[#94a3b8] font-medium mt-1">Monitore e registre suas operações comerciais.</p>
         </div>
         <Button 
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => { setEditingSale(null); setIsModalOpen(true); }}
           className="bg-[#FF1F3D] hover:bg-[#D91B34] text-white font-bold px-6"
         >
           <Plus className="mr-2 h-4 w-4" /> NOVA VENDA
@@ -187,6 +188,9 @@ function SalesPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="bg-secondary border-border text-white">
+                        <DropdownMenuItem className="cursor-pointer hover:bg-white/5" onClick={() => { setEditingSale(sale); setIsModalOpen(true); }}>
+                          <FileText className="mr-2 h-4 w-4" /> Editar
+                        </DropdownMenuItem>
                         <DropdownMenuItem className="cursor-pointer hover:bg-white/5">
                           <Eye className="mr-2 h-4 w-4" /> Detalhes
                         </DropdownMenuItem>
@@ -208,7 +212,14 @@ function SalesPage() {
           </TableBody>
         </Table>
       </div>
-      <SaleModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <SaleModal 
+        isOpen={isModalOpen} 
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingSale(null);
+        }} 
+        editingSale={editingSale}
+      />
     </div>
   );
 }
