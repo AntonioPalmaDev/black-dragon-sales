@@ -37,6 +37,7 @@ export const Route = createFileRoute("/_authenticated/products")({
 
 function ProductsPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { data: products, isLoading } = useQuery({
     queryKey: ["products"],
