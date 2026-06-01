@@ -212,7 +212,14 @@ function SalesPage() {
           </TableBody>
         </Table>
       </div>
-      <SaleModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <SaleModal 
+        isOpen={isModalOpen} 
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingSale(null);
+        }} 
+        editingSale={editingSale}
+      />
     </div>
   );
 }
