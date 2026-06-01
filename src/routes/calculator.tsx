@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/calculator" as any)({
+export const Route = createFileRoute("/calculator")({
   component: CalculatorPage,
 });
 
