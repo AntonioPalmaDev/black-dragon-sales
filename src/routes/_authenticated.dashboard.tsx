@@ -378,7 +378,7 @@ function DashboardPage() {
                     fontSize={10} 
                     tickLine={false} 
                     axisLine={false}
-                    tickFormatter={(value) => `R$ ${value >= 1000 ? (value/1000).toFixed(1) + 'k' : value}`}
+                    tickFormatter={formatCompactNumber}
                   />
                   <Tooltip 
                     contentStyle={{ 
