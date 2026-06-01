@@ -60,6 +60,9 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 function DashboardPage() {
+  const [dateRange, setDateRange] = useState<"7d" | "15d" | "30d" | "current_month">("current_month");
+  const [chartType, setChartType] = useState<"area" | "bar">("area");
+
   const { data: sales, isLoading: isLoadingSales } = useQuery({
     queryKey: ["dashboard-sales"],
     queryFn: async () => {
@@ -94,25 +97,61 @@ function DashboardPage() {
     },
   });
 
+  const filteredSales = useMemo(() => {
+    if (!sales) return [];
+    const now = new Date();
+    let start: Date;
+    let end: Date = endOfDay(now);
+
+    if (dateRange === "7d") {
+      start = startOfDay(subDays(now, 6));
+    } else if (dateRange === "15d") {
+      start = startOfDay(subDays(now, 14));
+    } else if (dateRange === "30d") {
+      start = startOfDay(subDays(now, 29));
+    } else {
+      start = startOfMonth(now);
+      end = endOfMonth(now);
+    }
+
+    return sales.filter(sale => {
+      const saleDate = new Date(sale.created_at);
+      return isWithinInterval(saleDate, { start, end });
+    });
+  }, [sales, dateRange]);
+
   const isLoading = isLoadingSales || isLoadingItems || isLoadingClients;
 
   // Calculate KPIs
-  const totalFaturamento = sales?.reduce((acc, sale) => acc + (sale.total_amount || 0), 0) || 0;
+  const totalFaturamento = filteredSales?.reduce((acc, sale) => acc + (sale.total_amount || 0), 0) || 0;
   const totalReceitaLiquida = totalFaturamento * 0.8; // Exemplo: 80% do faturamento
-  const totalLucroLiquido = sales?.reduce((acc, sale) => acc + (sale.net_profit || 0), 0) || 0;
-  const totalVendas = sales?.length || 0;
+  const totalLucroLiquido = filteredSales?.reduce((acc, sale) => acc + (sale.net_profit || 0), 0) || 0;
+  const totalVendas = filteredSales?.length || 0;
   const ticketMedio = totalVendas > 0 ? totalFaturamento / totalVendas : 0;
   const clientesAtivos = clients?.filter(c => c.is_active).length || 0;
-  const produtosVendidos = saleItems?.reduce((acc, item) => acc + (item.quantity || 0), 0) || 0;
+  const produtosVendidos = saleItems?.reduce((acc, item) => {
+    // Check if item belongs to a filtered sale
+    const sale = filteredSales.find(s => s.id === item.sale_id);
+    if (sale) return acc + (item.quantity || 0);
+    return acc;
+  }, 0) || 0;
 
-  // Revenue Chart Data (last 7 days for simplicity, or 30 days)
-  const last30Days = eachDayOfInterval({
-    start: subDays(new Date(), 29),
-    end: new Date(),
-  });
+  // Revenue Chart Data
+  const chartInterval = useMemo(() => {
+    const now = new Date();
+    if (dateRange === "7d") {
+      return { start: subDays(now, 6), end: now };
+    } else if (dateRange === "15d") {
+      return { start: subDays(now, 14), end: now };
+    } else if (dateRange === "30d") {
+      return { start: subDays(now, 29), end: now };
+    } else {
+      return { start: startOfMonth(now), end: endOfMonth(now) };
+    }
+  }, [dateRange]);
 
-  const revenueData = last30Days.map(date => {
-    const daySales = sales?.filter(sale => isSameDay(new Date(sale.created_at), date)) || [];
+  const revenueData = eachDayOfInterval(chartInterval).map(date => {
+    const daySales = filteredSales?.filter(sale => isSameDay(new Date(sale.created_at), date)) || [];
     const revenue = daySales.reduce((acc, sale) => acc + (sale.total_amount || 0), 0);
     const billing = revenue * 1.2; // Simulação de faturamento bruto vs líquido
     return {
