@@ -78,6 +78,7 @@ export type Database = {
           observations: string | null
           phone: string | null
           state: string | null
+          type: string | null
           updated_at: string
           zip_code: string | null
         }
@@ -93,6 +94,7 @@ export type Database = {
           observations?: string | null
           phone?: string | null
           state?: string | null
+          type?: string | null
           updated_at?: string
           zip_code?: string | null
         }
@@ -108,6 +110,7 @@ export type Database = {
           observations?: string | null
           phone?: string | null
           state?: string | null
+          type?: string | null
           updated_at?: string
           zip_code?: string | null
         }
