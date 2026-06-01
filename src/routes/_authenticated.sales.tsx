@@ -191,12 +191,6 @@ function SalesPage() {
                         <DropdownMenuItem className="cursor-pointer hover:bg-white/5" onClick={() => { setEditingSale(sale); setIsModalOpen(true); }}>
                           <FileText className="mr-2 h-4 w-4" /> Editar
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer hover:bg-white/5">
-                          <Eye className="mr-2 h-4 w-4" /> Detalhes
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer hover:bg-white/5">
-                          <FileText className="mr-2 h-4 w-4" /> Comprovante
-                        </DropdownMenuItem>
                         <DropdownMenuItem className="cursor-pointer text-yellow-500 hover:bg-yellow-500/10" onClick={() => handleCancelSale(sale.id)}>
                           <XCircle className="mr-2 h-4 w-4" /> Cancelar
                         </DropdownMenuItem>
