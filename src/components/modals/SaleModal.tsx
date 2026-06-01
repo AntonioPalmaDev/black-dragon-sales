@@ -298,6 +298,7 @@ export function SaleModal({ isOpen, onClose, editingSale }: SaleModalProps) {
                               ))}
                             </SelectContent>
                           </Select>
+                          <FormMessage />
                         </FormItem>
                       )} />
                     </div>
@@ -312,6 +313,7 @@ export function SaleModal({ isOpen, onClose, editingSale }: SaleModalProps) {
                               className="bg-[#0A0A0A] border-[#1F1F1F] h-11 rounded-lg focus:border-[#FF1F3D]" 
                             />
                           </FormControl>
+                          <FormMessage />
                         </FormItem>
                       )} />
                     </div>
@@ -328,10 +330,11 @@ export function SaleModal({ isOpen, onClose, editingSale }: SaleModalProps) {
                                 {...field} 
                                 className="bg-[#0A0A0A] border-[#1F1F1F] h-11 pl-8 rounded-lg focus:border-[#FF1F3D]" 
                               />
-                            </div>
-                          </FormControl>
-                        </FormItem>
-                      )} />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
                     </div>
                     <div className="col-span-3 md:col-span-2 flex justify-end">
                       <Button 
@@ -369,6 +372,7 @@ export function SaleModal({ isOpen, onClose, editingSale }: SaleModalProps) {
                           className="bg-[#0A0A0A] border-[#1F1F1F] text-right font-mono h-9 rounded-lg pl-8 focus:border-[#FF1F3D]" 
                         />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )} />
                 </div>
