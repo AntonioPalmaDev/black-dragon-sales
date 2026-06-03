@@ -23,25 +23,21 @@ function SignupPage() {
     setLoading(true);
     
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: {
-            display_name: name,
-          },
-          emailRedirectTo: window.location.origin + "/dashboard",
+          data: { display_name: name },
+          emailRedirectTo: window.location.origin + "/login",
         },
       });
 
       if (error) throw error;
 
-      if (data.session) {
-        toast.success("Conta criada com sucesso!");
-        navigate({ to: "/dashboard" });
-      } else {
-        toast.info("Verifique seu email para confirmar o cadastro.");
-      }
+      // Sign out immediately — user must wait for admin approval
+      await supabase.auth.signOut();
+      toast.success("Cadastro enviado! Aguarde a aprovação do administrador para acessar o sistema.");
+      navigate({ to: "/login" });
     } catch (error: any) {
       toast.error(error.message || "Erro ao criar conta");
     } finally {
