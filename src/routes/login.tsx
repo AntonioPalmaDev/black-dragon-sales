@@ -22,12 +22,32 @@ function LoginPage() {
     setLoading(true);
     
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
+
+      // Check approval status
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("status")
+        .eq("id", data.user!.id)
+        .maybeSingle();
+
+      if (profile?.status === "pending") {
+        await supabase.auth.signOut();
+        toast.warning("Seu cadastro está aguardando aprovação do administrador.");
+        setLoading(false);
+        return;
+      }
+      if (profile?.status === "rejected") {
+        await supabase.auth.signOut();
+        toast.error("Seu acesso foi negado pelo administrador.");
+        setLoading(false);
+        return;
+      }
 
       toast.success("Login realizado com sucesso!");
       navigate({ to: "/dashboard" });

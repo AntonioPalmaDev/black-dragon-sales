@@ -16,13 +16,15 @@ import {
   FileText,
   Wallet,
   Terminal,
-  User
+  User,
+  ShieldCheck
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useCurrentUser } from "@/hooks/use-current-user";
 
 export const Route = createFileRoute("/_authenticated")({
   component: AuthenticatedLayout,
@@ -33,6 +35,7 @@ function AuthenticatedLayout() {
   const isMobile = useIsMobile();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const me = useCurrentUser();
 
   const menuItems = [
     { label: "Dashboard", icon: LayoutDashboard, to: "/dashboard" },
@@ -44,6 +47,7 @@ function AuthenticatedLayout() {
     { label: "Histórico", icon: History, to: "/history" },
     { label: "Logs", icon: FileText, to: "/logs" },
     { label: "Calculadora", icon: Calculator, to: "/calculator" },
+    ...(me.isAdmin ? [{ label: "Usuários", icon: ShieldCheck, to: "/users" }] : []),
     { label: "Configurações", icon: Settings, to: "/settings" },
   ];
 
@@ -113,12 +117,14 @@ function AuthenticatedLayout() {
               )}>
                 <Avatar className="h-9 w-9 border border-[#1F1F1F]">
                   <AvatarImage src="" />
-                  <AvatarFallback className="bg-[#1A1A1A] text-white text-xs">AD</AvatarFallback>
+                  <AvatarFallback className="bg-[#1A1A1A] text-white text-xs">
+                    {(me.displayName ?? me.email ?? "U").slice(0, 2).toUpperCase()}
+                  </AvatarFallback>
                 </Avatar>
                 {!isCollapsed && (
                   <div className="flex flex-col overflow-hidden">
-                    <span className="text-sm font-semibold truncate">Administrador</span>
-                    <span className="text-[10px] text-[#94a3b8] truncate">admin@blackdragons.com</span>
+                    <span className="text-sm font-semibold truncate">{me.displayName ?? "Usuário"}</span>
+                    <span className="text-[10px] text-[#94a3b8] truncate">{me.email ?? ""}</span>
                   </div>
                 )}
               </div>
