@@ -177,21 +177,27 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           display_name: string | null
+          email: string | null
           id: string
+          status: Database["public"]["Enums"]["profile_status"]
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
+          email?: string | null
           id: string
+          status?: Database["public"]["Enums"]["profile_status"]
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
+          email?: string | null
           id?: string
+          status?: Database["public"]["Enums"]["profile_status"]
           updated_at?: string
         }
         Relationships: []
@@ -334,6 +340,7 @@ export type Database = {
         | "credito"
         | "boleto"
         | "transferencia"
+      profile_status: "pending" | "approved" | "rejected"
       sale_status: "pendente" | "concluido" | "cancelado"
     }
     CompositeTypes: {
@@ -471,6 +478,7 @@ export const Constants = {
         "boleto",
         "transferencia",
       ],
+      profile_status: ["pending", "approved", "rejected"],
       sale_status: ["pendente", "concluido", "cancelado"],
     },
   },
