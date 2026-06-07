@@ -154,24 +154,45 @@ export function ProductModal({ isOpen, onClose, editingProduct }: ProductModalPr
               </FormItem>
             )} />
 
-            <FormField control={form.control} name="sale_price" render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-xs uppercase tracking-widest text-zinc-500 font-bold">Valor Unitário</FormLabel>
-                <FormControl>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 font-bold">R$</span>
-                    <Input 
-                      type="number"
-                      step="0.01"
-                      {...field} 
-                      onChange={(e) => field.onChange(e.target.value === "" ? 0 : parseFloat(e.target.value))}
-                      className="bg-[#111111] border-[#1F1F1F] h-12 pl-12 focus:border-[#FF1F3D] focus:ring-[#FF1F3D] transition-all rounded-xl" 
-                    />
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <div className="grid grid-cols-2 gap-4">
+              <FormField control={form.control} name="cost_price" render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs uppercase tracking-widest text-zinc-500 font-bold">Preço de Custo</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 font-bold">R$</span>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        {...field}
+                        onChange={(e) => field.onChange(e.target.value === "" ? 0 : parseFloat(e.target.value))}
+                        className="bg-[#111111] border-[#1F1F1F] h-12 pl-12 focus:border-[#FF1F3D] focus:ring-[#FF1F3D] transition-all rounded-xl"
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+
+              <FormField control={form.control} name="sale_price" render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs uppercase tracking-widest text-zinc-500 font-bold">Valor de Venda</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 font-bold">R$</span>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        {...field}
+                        onChange={(e) => field.onChange(e.target.value === "" ? 0 : parseFloat(e.target.value))}
+                        className="bg-[#111111] border-[#1F1F1F] h-12 pl-12 focus:border-[#FF1F3D] focus:ring-[#FF1F3D] transition-all rounded-xl"
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+            </div>
 
             <div className="pt-2">
               <Button 
