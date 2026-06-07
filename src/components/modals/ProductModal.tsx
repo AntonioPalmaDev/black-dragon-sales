@@ -33,6 +33,7 @@ export function ProductModal({ isOpen, onClose, editingProduct }: ProductModalPr
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
+      cost_price: 0,
       sale_price: 0,
       is_active: true,
     },
@@ -42,12 +43,14 @@ export function ProductModal({ isOpen, onClose, editingProduct }: ProductModalPr
     if (editingProduct) {
       form.reset({
         name: editingProduct.name || "",
+        cost_price: Number(editingProduct.cost_price) || 0,
         sale_price: Number(editingProduct.sale_price) || 0,
         is_active: editingProduct.is_active ?? true,
       });
     } else {
       form.reset({
         name: "",
+        cost_price: 0,
         sale_price: 0,
         is_active: true,
       });
