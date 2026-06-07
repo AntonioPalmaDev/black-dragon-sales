@@ -12,7 +12,6 @@ import { useEffect, useState } from "react";
 
 const formSchema = z.object({
   name: z.string().min(2, "Nome é obrigatório"),
-  cost_price: z.coerce.number().min(0, "O custo deve ser maior ou igual a zero"),
   sale_price: z.coerce.number().min(0, "O valor deve ser maior ou igual a zero"),
   is_active: z.boolean(),
 });
