@@ -12,7 +12,6 @@ import { useEffect, useState } from "react";
 
 const formSchema = z.object({
   name: z.string().min(2, "Nome é obrigatório"),
-  cost_price: z.coerce.number().min(0, "O custo deve ser maior ou igual a zero"),
   sale_price: z.coerce.number().min(0, "O valor deve ser maior ou igual a zero"),
   is_active: z.boolean(),
 });
@@ -33,7 +32,6 @@ export function ProductModal({ isOpen, onClose, editingProduct }: ProductModalPr
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      cost_price: 0,
       sale_price: 0,
       is_active: true,
     },
@@ -43,14 +41,12 @@ export function ProductModal({ isOpen, onClose, editingProduct }: ProductModalPr
     if (editingProduct) {
       form.reset({
         name: editingProduct.name || "",
-        cost_price: Number(editingProduct.cost_price) || 0,
         sale_price: Number(editingProduct.sale_price) || 0,
         is_active: editingProduct.is_active ?? true,
       });
     } else {
       form.reset({
         name: "",
-        cost_price: 0,
         sale_price: 0,
         is_active: true,
       });
@@ -154,45 +150,24 @@ export function ProductModal({ isOpen, onClose, editingProduct }: ProductModalPr
               </FormItem>
             )} />
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField control={form.control} name="cost_price" render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-xs uppercase tracking-widest text-zinc-500 font-bold">Preço de Custo</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 font-bold">R$</span>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        {...field}
-                        onChange={(e) => field.onChange(e.target.value === "" ? 0 : parseFloat(e.target.value))}
-                        className="bg-[#111111] border-[#1F1F1F] h-12 pl-12 focus:border-[#FF1F3D] focus:ring-[#FF1F3D] transition-all rounded-xl"
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-
-              <FormField control={form.control} name="sale_price" render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-xs uppercase tracking-widest text-zinc-500 font-bold">Valor de Venda</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 font-bold">R$</span>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        {...field}
-                        onChange={(e) => field.onChange(e.target.value === "" ? 0 : parseFloat(e.target.value))}
-                        className="bg-[#111111] border-[#1F1F1F] h-12 pl-12 focus:border-[#FF1F3D] focus:ring-[#FF1F3D] transition-all rounded-xl"
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-            </div>
+            <FormField control={form.control} name="sale_price" render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-xs uppercase tracking-widest text-zinc-500 font-bold">Valor de Venda</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 font-bold">R$</span>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      {...field}
+                      onChange={(e) => field.onChange(e.target.value === "" ? 0 : parseFloat(e.target.value))}
+                      className="bg-[#111111] border-[#1F1F1F] h-12 pl-12 focus:border-[#FF1F3D] focus:ring-[#FF1F3D] transition-all rounded-xl"
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
 
             <div className="pt-2">
               <Button 

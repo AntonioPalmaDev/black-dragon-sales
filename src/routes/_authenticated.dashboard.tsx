@@ -125,16 +125,7 @@ function DashboardPage() {
   // Calculate KPIs
   const totalFaturamento = filteredSales?.reduce((acc, sale) => acc + (sale.total_amount || 0), 0) || 0;
   
-  const totalLucroLiquido = saleItems?.reduce((acc, item) => {
-    const sale = filteredSales.find(s => s.id === item.sale_id);
-    if (sale) {
-      const product = item.products;
-      const cost = product?.cost_price || 0;
-      const price = item.unit_price || 0;
-      return acc + ((price - cost) * (item.quantity || 1));
-    }
-    return acc;
-  }, 0) || 0;
+  const totalLucroLiquido = filteredSales?.reduce((acc, sale) => acc + (Number(sale.net_profit) || 0), 0) || 0;
 
   const totalVendas = filteredSales?.length || 0;
   const ticketMedio = totalVendas > 0 ? totalFaturamento / totalVendas : 0;
@@ -163,20 +154,7 @@ function DashboardPage() {
   const revenueData = eachDayOfInterval(chartInterval).map(date => {
     const daySales = filteredSales?.filter(sale => isSameDay(new Date(sale.created_at), date)) || [];
     const revenue = daySales.reduce((acc, sale) => acc + (sale.total_amount || 0), 0);
-    
-    // Calculate net profit based on items in those sales
-    const dayProfit = saleItems?.reduce((acc, item) => {
-      const sale = daySales.find(s => s.id === item.sale_id);
-      if (sale) {
-        // If we have product cost info, use it. 
-        // net_profit in sale might be 0 if not updated by trigger, so we calculate here
-        const product = item.products;
-        const cost = product?.cost_price || 0;
-        const price = item.unit_price || 0;
-        return acc + ((price - cost) * (item.quantity || 1));
-      }
-      return acc;
-    }, 0) || 0;
+    const dayProfit = daySales.reduce((acc, sale) => acc + (Number(sale.net_profit) || 0), 0);
 
     return {
       name: format(date, "dd/MM"),
