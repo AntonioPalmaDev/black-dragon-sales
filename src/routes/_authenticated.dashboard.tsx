@@ -180,14 +180,15 @@ function DashboardPage() {
 
   const revenueData = eachDayOfInterval(chartInterval).map(date => {
     const daySales = filteredSales?.filter(sale => isSameDay(new Date(sale.created_at), date)) || [];
-    const revenue = daySales.reduce((acc, sale) => acc + (Number(sale.total_amount) || 0), 0);
     const daySaleIds = new Set(daySales.map((s) => s.id));
-    const dayProfit = computeProfitForSaleIds(daySaleIds);
+    const receita = daySales.reduce((acc, sale) => acc + (Number(sale.total_amount) || 0), 0);
+    const custos = computeCostForSaleIds(daySaleIds);
+    const lucro = receita - custos;
 
     return {
       name: format(date, "dd/MM"),
-      revenue,
-      netProfit: dayProfit
+      receita,
+      lucro,
     };
   });
 
