@@ -125,16 +125,22 @@ function DashboardPage() {
   // Calculate KPIs
   const totalFaturamento = filteredSales?.reduce((acc, sale) => acc + (Number(sale.total_amount) || 0), 0) || 0;
 
-  // Lucro líquido calculado a partir dos itens: (preço de venda - custo) * qtd - desconto
-  const computeProfitForSaleIds = (saleIds: Set<string>) => {
+  // Custo Operacional = Σ (cost_price * quantity) dos itens das vendas filtradas
+  const computeCostForSaleIds = (saleIds: Set<string>) => {
     if (!saleItems) return 0;
     return saleItems.reduce((acc: number, item: any) => {
       if (!saleIds.has(item.sale_id)) return acc;
       const cost = Number(item.products?.cost_price) || 0;
-      const unit = Number(item.unit_price) || 0;
       const qty = Number(item.quantity) || 0;
-      const disc = Number(item.discount_item) || 0;
-      return acc + ((unit - cost) * qty - disc);
+      return acc + cost * qty;
+    }, 0);
+  };
+
+  const computeRevenueForSaleIds = (saleIds: Set<string>) => {
+    if (!filteredSales) return 0;
+    return filteredSales.reduce((acc, sale) => {
+      if (!saleIds.has(sale.id)) return acc;
+      return acc + (Number(sale.total_amount) || 0);
     }, 0);
   };
 
@@ -142,16 +148,21 @@ function DashboardPage() {
     () => new Set((filteredSales || []).map((s) => s.id)),
     [filteredSales]
   );
-  const totalLucroLiquido = computeProfitForSaleIds(filteredSaleIds);
+  const totalCustos = computeCostForSaleIds(filteredSaleIds);
+  // Lucro Final = Receita Total - Custos Totais
+  const totalLucroLiquido = totalFaturamento - totalCustos;
 
   const totalVendas = filteredSales?.length || 0;
-  const ticketMedio = totalVendas > 0 ? totalFaturamento / totalVendas : 0;
   const clientesAtivos = clients?.filter(c => c.is_active).length || 0;
   const produtosVendidos = saleItems?.reduce((acc, item) => {
     const sale = filteredSales.find(s => s.id === item.sale_id);
     if (sale) return acc + (item.quantity || 0);
     return acc;
   }, 0) || 0;
+
+  // Meta mensal de vendas (Receita)
+  const META_VENDAS = 200000;
+  const metaProgressoPct = Math.min(100, (totalFaturamento / META_VENDAS) * 100);
 
   // Revenue Chart Data
   const chartInterval = useMemo(() => {
