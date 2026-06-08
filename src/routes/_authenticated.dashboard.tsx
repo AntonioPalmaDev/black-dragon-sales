@@ -125,16 +125,22 @@ function DashboardPage() {
   // Calculate KPIs
   const totalFaturamento = filteredSales?.reduce((acc, sale) => acc + (Number(sale.total_amount) || 0), 0) || 0;
 
-  // Lucro líquido calculado a partir dos itens: (preço de venda - custo) * qtd - desconto
-  const computeProfitForSaleIds = (saleIds: Set<string>) => {
+  // Custo Operacional = Σ (cost_price * quantity) dos itens das vendas filtradas
+  const computeCostForSaleIds = (saleIds: Set<string>) => {
     if (!saleItems) return 0;
     return saleItems.reduce((acc: number, item: any) => {
       if (!saleIds.has(item.sale_id)) return acc;
       const cost = Number(item.products?.cost_price) || 0;
-      const unit = Number(item.unit_price) || 0;
       const qty = Number(item.quantity) || 0;
-      const disc = Number(item.discount_item) || 0;
-      return acc + ((unit - cost) * qty - disc);
+      return acc + cost * qty;
+    }, 0);
+  };
+
+  const computeRevenueForSaleIds = (saleIds: Set<string>) => {
+    if (!filteredSales) return 0;
+    return filteredSales.reduce((acc, sale) => {
+      if (!saleIds.has(sale.id)) return acc;
+      return acc + (Number(sale.total_amount) || 0);
     }, 0);
   };
 
@@ -142,16 +148,21 @@ function DashboardPage() {
     () => new Set((filteredSales || []).map((s) => s.id)),
     [filteredSales]
   );
-  const totalLucroLiquido = computeProfitForSaleIds(filteredSaleIds);
+  const totalCustos = computeCostForSaleIds(filteredSaleIds);
+  // Lucro Final = Receita Total - Custos Totais
+  const totalLucroLiquido = totalFaturamento - totalCustos;
 
   const totalVendas = filteredSales?.length || 0;
-  const ticketMedio = totalVendas > 0 ? totalFaturamento / totalVendas : 0;
   const clientesAtivos = clients?.filter(c => c.is_active).length || 0;
   const produtosVendidos = saleItems?.reduce((acc, item) => {
     const sale = filteredSales.find(s => s.id === item.sale_id);
     if (sale) return acc + (item.quantity || 0);
     return acc;
   }, 0) || 0;
+
+  // Meta mensal de vendas (Receita)
+  const META_VENDAS = 200000;
+  const metaProgressoPct = Math.min(100, (totalFaturamento / META_VENDAS) * 100);
 
   // Revenue Chart Data
   const chartInterval = useMemo(() => {
@@ -169,14 +180,15 @@ function DashboardPage() {
 
   const revenueData = eachDayOfInterval(chartInterval).map(date => {
     const daySales = filteredSales?.filter(sale => isSameDay(new Date(sale.created_at), date)) || [];
-    const revenue = daySales.reduce((acc, sale) => acc + (Number(sale.total_amount) || 0), 0);
     const daySaleIds = new Set(daySales.map((s) => s.id));
-    const dayProfit = computeProfitForSaleIds(daySaleIds);
+    const receita = daySales.reduce((acc, sale) => acc + (Number(sale.total_amount) || 0), 0);
+    const custos = computeCostForSaleIds(daySaleIds);
+    const lucro = receita - custos;
 
     return {
       name: format(date, "dd/MM"),
-      revenue,
-      netProfit: dayProfit
+      receita,
+      lucro,
     };
   });
 
@@ -388,7 +400,7 @@ function DashboardPage() {
                   />
                   <Area 
                     type="monotone" 
-                    dataKey="revenue" 
+                    dataKey="receita" 
                     name="Receita Total"
                     stroke="#FF1F3D" 
                     strokeWidth={4}
@@ -398,9 +410,9 @@ function DashboardPage() {
                   />
                   <Area 
                     type="monotone" 
-                    dataKey="netProfit" 
+                    dataKey="lucro" 
                     name="Lucro Final"
-                    stroke="#475569" 
+                    stroke="#22c55e" 
                     strokeWidth={2}
                     strokeDasharray="5 5"
                     fill="transparent"
@@ -435,8 +447,8 @@ function DashboardPage() {
                     itemStyle={{ fontSize: "12px", fontWeight: "bold" }}
                     cursor={{ fill: 'rgba(255,31,61,0.1)' }}
                   />
-                  <Bar dataKey="revenue" name="Receita Total" fill="#FF1F3D" radius={[4, 4, 0, 0]} barSize={20} />
-                  <Bar dataKey="netProfit" name="Lucro Final" fill="#475569" radius={[4, 4, 0, 0]} barSize={20} />
+                  <Bar dataKey="receita" name="Receita Total" fill="#FF1F3D" radius={[4, 4, 0, 0]} barSize={20} />
+                  <Bar dataKey="lucro" name="Lucro Final" fill="#22c55e" radius={[4, 4, 0, 0]} barSize={20} />
                 </BarChart>
               )}
             </ResponsiveContainer>
@@ -450,7 +462,7 @@ function DashboardPage() {
             </CardHeader>
             <CardContent className="space-y-6 pt-2">
               <StatRow label="Receita Total Acumulada" value={formatCurrency(totalFaturamento)} />
-              <StatRow label="Ticket Médio" value={formatCurrency(ticketMedio)} />
+              <StatRow label="Custo Operacional" value={formatCurrency(totalCustos)} />
               <StatRow label="Produtividade" value="+12.5%" isGreen />
               
               <div className="pt-6 border-t border-[#1F1F1F]">
@@ -459,17 +471,17 @@ function DashboardPage() {
                   <div className="flex justify-between items-end">
                     <div className="flex flex-col">
                       <span className="text-[10px] text-[#475569] uppercase font-bold">Progresso</span>
-                      <span className="text-sm font-black text-white">{formatCurrency(totalLucroLiquido)}</span>
+                      <span className="text-sm font-black text-white">{formatCurrency(totalFaturamento)}</span>
                     </div>
-                    <span className="text-[#FF1F3D] font-black text-xl">{Math.round((totalLucroLiquido / 200000) * 100)}%</span>
+                    <span className="text-[#FF1F3D] font-black text-xl">{Math.round(metaProgressoPct)}%</span>
                   </div>
                   <div className="h-2 w-full bg-[#0A0A0A] rounded-full overflow-hidden border border-[#1F1F1F]">
                     <div 
                       className="h-full bg-gradient-to-r from-[#FF1F3D] to-[#D91B34] shadow-[0_0_15px_rgba(255,31,61,0.5)] transition-all duration-1000" 
-                      style={{ width: `${Math.min(100, (totalLucroLiquido / 200000) * 100)}%` }} 
+                      style={{ width: `${metaProgressoPct}%` }} 
                     />
                   </div>
-                  <p className="text-[10px] text-[#475569] text-center italic">R$ 200.000,00 projetados para este mês</p>
+                  <p className="text-[10px] text-[#475569] text-center italic">{formatCurrency(META_VENDAS)} projetados para este mês</p>
                 </div>
               </div>
             </CardContent>
@@ -498,16 +510,7 @@ function DashboardPage() {
       </div>
 
       {/* KPI Grid - Now below the main chart */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-4">
-        <KPICard 
-          title="Lucro Final" 
-
-          value={formatCurrency(totalLucroLiquido)} 
-
-          change="+8.4%" 
-          trend="up" 
-          icon={Wallet} 
-        />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4">
         <KPICard 
           title="Receita Total" 
           value={formatCurrency(totalFaturamento)} 
@@ -518,16 +521,16 @@ function DashboardPage() {
         <KPICard 
           title="Lucro Final" 
           value={formatCurrency(totalLucroLiquido)} 
-          change="+5.2%" 
+          change="+8.4%" 
           trend="up" 
-          icon={Activity} 
+          icon={Wallet} 
         />
         <KPICard 
-          title="Ticket Médio" 
-          value={formatCurrency(ticketMedio)} 
+          title="Custo Operacional" 
+          value={formatCurrency(totalCustos)} 
           change="-2.4%" 
           trend="down" 
-          icon={ShoppingCart} 
+          icon={Activity} 
         />
         <KPICard 
           title="Total Vendas" 
@@ -578,7 +581,7 @@ function DashboardPage() {
           data={[
             { name: "Receita Total", value: Math.min(100, Math.round((totalFaturamento / 250000) * 100)), color: "#FF1F3D" },
             { name: "Novos Clientes", value: Math.min(100, Math.round((clientesAtivos / 50) * 100)), color: "#475569" },
-            { name: "Ticket Médio", value: Math.min(100, Math.round((ticketMedio / 500) * 100)), color: "#FF1F3D" },
+            { name: "Lucro Final", value: Math.min(100, Math.round((totalLucroLiquido / 100000) * 100)), color: "#22c55e" },
             { name: "Vendas", value: Math.min(100, Math.round((totalVendas / 100) * 100)), color: "#475569" },
           ]} 
           type="goal" 
