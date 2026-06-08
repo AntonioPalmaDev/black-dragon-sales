@@ -123,15 +123,31 @@ function DashboardPage() {
   const isLoading = isLoadingSales || isLoadingItems || isLoadingClients;
 
   // Calculate KPIs
-  const totalFaturamento = filteredSales?.reduce((acc, sale) => acc + (sale.total_amount || 0), 0) || 0;
-  
-  const totalLucroLiquido = filteredSales?.reduce((acc, sale) => acc + (Number(sale.net_profit) || 0), 0) || 0;
+  const totalFaturamento = filteredSales?.reduce((acc, sale) => acc + (Number(sale.total_amount) || 0), 0) || 0;
+
+  // Lucro líquido calculado a partir dos itens: (preço de venda - custo) * qtd - desconto
+  const computeProfitForSaleIds = (saleIds: Set<string>) => {
+    if (!saleItems) return 0;
+    return saleItems.reduce((acc: number, item: any) => {
+      if (!saleIds.has(item.sale_id)) return acc;
+      const cost = Number(item.products?.cost_price) || 0;
+      const unit = Number(item.unit_price) || 0;
+      const qty = Number(item.quantity) || 0;
+      const disc = Number(item.discount_item) || 0;
+      return acc + ((unit - cost) * qty - disc);
+    }, 0);
+  };
+
+  const filteredSaleIds = useMemo(
+    () => new Set((filteredSales || []).map((s) => s.id)),
+    [filteredSales]
+  );
+  const totalLucroLiquido = computeProfitForSaleIds(filteredSaleIds);
 
   const totalVendas = filteredSales?.length || 0;
   const ticketMedio = totalVendas > 0 ? totalFaturamento / totalVendas : 0;
   const clientesAtivos = clients?.filter(c => c.is_active).length || 0;
   const produtosVendidos = saleItems?.reduce((acc, item) => {
-    // Check if item belongs to a filtered sale
     const sale = filteredSales.find(s => s.id === item.sale_id);
     if (sale) return acc + (item.quantity || 0);
     return acc;
@@ -153,8 +169,9 @@ function DashboardPage() {
 
   const revenueData = eachDayOfInterval(chartInterval).map(date => {
     const daySales = filteredSales?.filter(sale => isSameDay(new Date(sale.created_at), date)) || [];
-    const revenue = daySales.reduce((acc, sale) => acc + (sale.total_amount || 0), 0);
-    const dayProfit = daySales.reduce((acc, sale) => acc + (Number(sale.net_profit) || 0), 0);
+    const revenue = daySales.reduce((acc, sale) => acc + (Number(sale.total_amount) || 0), 0);
+    const daySaleIds = new Set(daySales.map((s) => s.id));
+    const dayProfit = computeProfitForSaleIds(daySaleIds);
 
     return {
       name: format(date, "dd/MM"),
