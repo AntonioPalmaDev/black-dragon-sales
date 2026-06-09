@@ -126,18 +126,19 @@ function DashboardPage() {
   const totalFaturamento = filteredSales?.reduce((acc, sale) => acc + (Number(sale.total_amount) || 0), 0) || 0;
 
   // Custo da peça de arma por categoria (valor fixo por unidade)
-  // Fuzil pesado: 20k | Fuzil leve: 15k | Pistola: 5k | SMG leve: 5k
+  // Fuzil pesado: 20k | Fuzil leve: 15k | Pistola: 5k
   const getWeaponPartCost = (productName?: string): number => {
     if (!productName) return 0;
     const n = productName.toLowerCase().trim();
     // Fuzil pesado
     if (["sig"].includes(n)) return 20000;
-    // Fuzil leve
-    if (["g36", "g36c", "parafal", "ar15", "ar-15", "m4a4", "m4"].includes(n)) return 15000;
+    // Fuzil leve (inclui Evo, SMG leve e Parafal)
+    if ([
+      "g36", "g36c", "parafal", "ar15", "ar-15", "m4a4", "m4",
+      "evo", "mtar", "mp7", "uzi"
+    ].includes(n)) return 15000;
     // Pistola
     if (["five", "five-seven", "glock"].includes(n)) return 5000;
-    // SMG leve
-    if (["mtar", "mp7", "uzi"].includes(n)) return 5000;
     return 0;
   };
 
