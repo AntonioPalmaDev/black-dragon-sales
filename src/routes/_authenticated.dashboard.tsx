@@ -125,12 +125,28 @@ function DashboardPage() {
   // Calculate KPIs
   const totalFaturamento = filteredSales?.reduce((acc, sale) => acc + (Number(sale.total_amount) || 0), 0) || 0;
 
-  // Custo Operacional = Σ (cost_price * quantity) dos itens das vendas filtradas
+  // Custo da peça de arma por categoria (valor fixo por unidade)
+  // Fuzil pesado: 20k | Fuzil leve: 15k | Pistola: 5k | SMG leve: 5k
+  const getWeaponPartCost = (productName?: string): number => {
+    if (!productName) return 0;
+    const n = productName.toLowerCase().trim();
+    // Fuzil pesado
+    if (["sig"].includes(n)) return 20000;
+    // Fuzil leve
+    if (["g36", "g36c", "parafal", "ar15", "ar-15", "m4a4", "m4"].includes(n)) return 15000;
+    // Pistola
+    if (["five", "five-seven", "glock"].includes(n)) return 5000;
+    // SMG leve
+    if (["mtar", "mp7", "uzi"].includes(n)) return 5000;
+    return 0;
+  };
+
+  // Custo Operacional = Σ (custo da peça * quantity) dos itens das vendas filtradas
   const computeCostForSaleIds = (saleIds: Set<string>) => {
     if (!saleItems) return 0;
     return saleItems.reduce((acc: number, item: any) => {
       if (!saleIds.has(item.sale_id)) return acc;
-      const cost = Number(item.products?.cost_price) || 0;
+      const cost = getWeaponPartCost(item.products?.name);
       const qty = Number(item.quantity) || 0;
       return acc + cost * qty;
     }, 0);
